@@ -41,14 +41,19 @@ public sealed class ChromeController
     public ToolsBar Tools { get; } = new();
     public ActionsBar Actions { get; } = new();
 
-    /// <summary>Extra bars that follow the tools bar (the censor style bar).</summary>
-    public FrameworkElement? Secondary { get; set; }
+    /// <summary>Follows the tools bar while the Censor tool is active.</summary>
+    public CensorBar Censor { get; } = new() { Visibility = Visibility.Collapsed };
 
-    public void Attach(CaptureSession session) => Tools.Session = session;
+    public void Attach(CaptureSession session)
+    {
+        Tools.Session = session;
+        Censor.Session = session;
+    }
 
     public void Detach()
     {
         Tools.Session = null;
+        Censor.Session = null;
         _colorPopup.IsOpen = false;
         Hide();
         MoveTo(null);
@@ -58,7 +63,7 @@ public sealed class ChromeController
     {
         _visible = false;
         Tools.Visibility = Actions.Visibility = Visibility.Collapsed;
-        if (Secondary is not null) Secondary.Visibility = Visibility.Collapsed;
+        Censor.Visibility = Visibility.Collapsed;
     }
 
     public void Update(CaptureSession session, IReadOnlyList<OverlayWindow> windows)
@@ -81,13 +86,16 @@ public sealed class ChromeController
         Place(Tools, Tools.Panel, toolsRect, session, host);
         Place(Actions, Actions.Panel, actionsRect, session, host);
 
-        if (Secondary is not null && Secondary.Visibility == Visibility.Visible)
+        Censor.Visibility = session.Tool == ToolKind.Censor ? Visibility.Visible : Visibility.Collapsed;
+        if (Censor.Visibility == Visibility.Visible)
         {
-            var size = PhysicalSize(Secondary, scale);
-            var left = toolsRect.X > sel.X ? toolsRect.Right + gap / 2 : toolsRect.X - gap / 2 - size.Width;
-            var secondaryRect = new PixelRect(left, toolsRect.Y, size.Width, size.Height);
-            Canvas.SetLeft(Secondary, (secondaryRect.X - monitor.Bounds.X) / scale);
-            Canvas.SetTop(Secondary, (secondaryRect.Y - monitor.Bounds.Y) / scale);
+            // Beside the tools bar, on the side away from the selection; kept inside the monitor.
+            var size = PhysicalSize(Censor, scale);
+            var left = toolsRect.X >= sel.Right ? toolsRect.Right + gap / 2 : toolsRect.X - gap / 2 - size.Width;
+            if (left + size.Width > monitor.Bounds.Right || left < monitor.Bounds.X) left = toolsRect.X - gap / 2 - size.Width;
+            var x = Math.Clamp(left, monitor.Bounds.X, monitor.Bounds.Right - size.Width);
+            var censorRect = new PixelRect(x, toolsRect.Y, size.Width, size.Height);
+            Place(Censor, Censor.Panel, censorRect, session, host);
         }
 
         if (!_visible)
@@ -101,13 +109,13 @@ public sealed class ChromeController
     private void MoveTo(OverlayWindow? host)
     {
         if (host == _host) return;
-        foreach (var element in new FrameworkElement?[] { Tools, Actions, Secondary })
+        foreach (var element in new FrameworkElement[] { Tools, Actions, Censor })
             if (element?.Parent is Panel parent) parent.Children.Remove(element);
         _host = host;
         if (host is null) return;
         host.Chrome.Children.Add(Tools);
         host.Chrome.Children.Add(Actions);
-        if (Secondary is not null) host.Chrome.Children.Add(Secondary);
+        host.Chrome.Children.Add(Censor);
     }
 
     private static PixelSize PhysicalSize(FrameworkElement element, double scale)

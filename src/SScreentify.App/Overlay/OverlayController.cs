@@ -290,6 +290,7 @@ public sealed class OverlayController
     {
         _editor.Commit();
         RedrawAll();
+        UpdateChrome();
     }
 
     private void UpdateChrome()
