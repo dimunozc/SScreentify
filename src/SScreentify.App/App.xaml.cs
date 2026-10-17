@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Win32;
+using SScreentify.App.Export;
 using SScreentify.App.Overlay;
 using SScreentify.App.Services;
 using SScreentify.App.Ui;
@@ -17,6 +18,8 @@ public partial class App : Application
     private TrayIcon? _tray;
     private HotkeyService? _hotkeys;
     private OverlayController? _overlay;
+    private ExportActions? _export;
+    private readonly ToastService _toasts = new();
 
     internal AppSettings Settings { get; private set; } = new();
 
@@ -46,6 +49,7 @@ public partial class App : Application
 
         _overlay = new OverlayController(() => Settings, SaveSettings);
         _overlay.Prewarm();
+        _export = new ExportActions(_overlay, () => Settings, SaveSettings, _toasts);
 
         _hotkeys = new HotkeyService();
         _hotkeys.Pressed += OnHotkey;
@@ -86,6 +90,7 @@ public partial class App : Application
     private void OnHotkey(HotkeyId id)
     {
         if (id == HotkeyId.Main) StartCapture();
+        else if (id == HotkeyId.SaveFullscreen) _export?.SaveFullscreenInstant();
     }
 
     private void StartCapture() => _overlay?.Open();

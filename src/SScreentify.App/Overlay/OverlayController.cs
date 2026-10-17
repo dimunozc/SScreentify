@@ -43,6 +43,10 @@ public sealed class OverlayController
     public IReadOnlyList<OverlayWindow> Windows => _windows;
     public ChromeController Chrome => _chrome;
 
+    /// <summary>The window of the selection's monitor (owner for dialogs).</summary>
+    public OverlayWindow? HostWindow =>
+        Session?.Selection.Rect is { } r ? WindowAt(new PointD(r.Center.X, r.Center.Y)) : _windows.FirstOrDefault();
+
     public event Action<CaptureSession>? SessionOpened;
     public event Action? SessionClosed;
     public event Action<CaptureSession>? CopyRequested, SaveRequested, PrintRequested;
@@ -231,6 +235,18 @@ public sealed class OverlayController
                 return true;
             case Key.A when ctrl:
                 SelectFullScreen(s);
+                return true;
+            case Key.C when ctrl:
+                CopyRequested?.Invoke(s);
+                return true;
+            case Key.S when ctrl:
+                SaveRequested?.Invoke(s);
+                return true;
+            case Key.P when ctrl:
+                PrintRequested?.Invoke(s);
+                return true;
+            case Key.X when ctrl:
+                Close();
                 return true;
             case Key.Left: s.Selection.Nudge(-1, 0, shift); return true;
             case Key.Right: s.Selection.Nudge(1, 0, shift); return true;
