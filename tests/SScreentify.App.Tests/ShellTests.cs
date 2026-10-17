@@ -47,6 +47,15 @@ public class ShellTests
     }
 
     [Fact]
+    public void Strings_EveryPropertyResolves()
+    {
+        var properties = typeof(Strings).GetProperties().Where(p => p.PropertyType == typeof(string)).ToList();
+        Assert.Equal(35, properties.Count);
+        foreach (var p in properties)
+            Assert.False(string.IsNullOrWhiteSpace((string?)p.GetValue(null)), p.Name);
+    }
+
+    [Fact]
     public void Strings_TrayTooltipFormatsHotkey()
     {
         Assert.Equal("Pulsa Impr Pant para capturar", string.Format(Strings.TrayTooltip, "Impr Pant"));

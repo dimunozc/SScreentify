@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Win32;
+using SScreentify.App.Overlay;
 using SScreentify.App.Services;
 using SScreentify.App.Ui;
 using SScreentify.Core.Hotkeys;
@@ -15,6 +16,7 @@ public partial class App : Application
     private SettingsStore _store = null!;
     private TrayIcon? _tray;
     private HotkeyService? _hotkeys;
+    private OverlayController? _overlay;
 
     internal AppSettings Settings { get; private set; } = new();
 
@@ -41,6 +43,9 @@ public partial class App : Application
         Settings = loaded.Settings;
         SettingsWereCorrupt = loaded.WasCorrupt;
         if (SettingsWereCorrupt) Debug.WriteLine(Strings.SettingsCorrupt);
+
+        _overlay = new OverlayController(() => Settings, SaveSettings);
+        _overlay.Prewarm();
 
         _hotkeys = new HotkeyService();
         _hotkeys.Pressed += OnHotkey;
@@ -83,5 +88,5 @@ public partial class App : Application
         if (id == HotkeyId.Main) StartCapture();
     }
 
-    private void StartCapture() => Debug.WriteLine("capture requested");
+    private void StartCapture() => _overlay?.Open();
 }

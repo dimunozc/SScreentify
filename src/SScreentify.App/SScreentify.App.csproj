@@ -25,16 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Ui\Strings.resx">
-      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
-      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
-      <StronglyTypedNamespace>SScreentify.App.Ui</StronglyTypedNamespace>
-      <StronglyTypedClassName>Strings</StronglyTypedClassName>
-      <PublicClass>true</PublicClass>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <InternalsVisibleTo Include="SScreentify.App.Tests" />
   </ItemGroup>
 
