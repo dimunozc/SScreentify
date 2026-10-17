@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="TrayTooltip" xml:space="preserve"><value>Pulsa {0} para capturar</value></data>
+  <data name="MenuCapture" xml:space="preserve"><value>Capturar</value></data>
+  <data name="MenuOptions" xml:space="preserve"><value>Opciones</value></data>
+  <data name="MenuAbout" xml:space="preserve"><value>Acerca de</value></data>
+  <data name="MenuExit" xml:space="preserve"><value>Salir</value></data>
+  <data name="ToastCopied" xml:space="preserve"><value>Captura copiada al portapapeles</value></data>
+  <data name="ToastSaved" xml:space="preserve"><value>Captura guardada en {0}. Haz clic para abrir la carpeta.</value></data>
+  <data name="ToastCopyBusy" xml:space="preserve"><value>No se pudo copiar: el portapapeles está ocupado por otra aplicación.</value></data>
+  <data name="ToastSaveFailed" xml:space="preserve"><value>No se pudo guardar la captura: {0}</value></data>
+  <data name="ToastHotkeyFailed" xml:space="preserve"><value>No se pudo registrar el atajo {0}. Probablemente otra aplicación ya lo usa. Haz clic aquí para abrir Opciones.</value></data>
+  <data name="ToastSnippingConflict" xml:space="preserve"><value>Windows tiene asignada la tecla Impr Pant a la herramienta Recortes. Desactívalo para usarla con sScreentify.</value></data>
+  <data name="ButtonOpenWindowsSettings" xml:space="preserve"><value>Abrir configuración de Windows</value></data>
+  <data name="SettingsCorrupt" xml:space="preserve"><value>La configuración estaba dañada. Se guardó una copia en settings.json.bak y se restauraron los valores por defecto.</value></data>
+  <data name="HotkeyInvalid" xml:space="preserve"><value>Uno de tus atajos no es válido. Si quieres desactivarlo, desmarca su casilla.</value></data>
+  <data name="HotkeyDuplicate" xml:space="preserve"><value>No puedes asignar el mismo atajo a dos funciones. Cambia uno de ellos.</value></data>
+  <data name="CensorNote" xml:space="preserve"><value>El pixelado y el desenfoque pueden revertirse en parte. Para datos sensibles usa el bloque sólido.</value></data>
+  <data name="ToolSelect" xml:space="preserve"><value>Selección (V)</value></data>
+  <data name="ToolPen" xml:space="preserve"><value>Lápiz</value></data>
+  <data name="ToolLine" xml:space="preserve"><value>Línea</value></data>
+  <data name="ToolArrow" xml:space="preserve"><value>Flecha</value></data>
+  <data name="ToolRectangle" xml:space="preserve"><value>Rectángulo</value></data>
+  <data name="ToolEllipse" xml:space="preserve"><value>Círculo</value></data>
+  <data name="ToolMarker" xml:space="preserve"><value>Resaltador</value></data>
+  <data name="ToolText" xml:space="preserve"><value>Texto</value></data>
+  <data name="ToolCensor" xml:space="preserve"><value>Censurar</value></data>
+  <data name="ToolColor" xml:space="preserve"><value>Color</value></data>
+  <data name="ToolUndo" xml:space="preserve"><value>Deshacer (Ctrl+Z)</value></data>
+  <data name="ToolRedo" xml:space="preserve"><value>Rehacer (Ctrl+Y)</value></data>
+  <data name="ActionCopy" xml:space="preserve"><value>Copiar (Ctrl+C)</value></data>
+  <data name="ActionSave" xml:space="preserve"><value>Guardar (Ctrl+S)</value></data>
+  <data name="ActionPrint" xml:space="preserve"><value>Imprimir (Ctrl+P)</value></data>
+  <data name="ActionClose" xml:space="preserve"><value>Cerrar (Esc)</value></data>
+  <data name="CensorPixelate" xml:space="preserve"><value>Pixelado</value></data>
+  <data name="CensorBlur" xml:space="preserve"><value>Desenfoque</value></data>
+  <data name="CensorSolid" xml:space="preserve"><value>Bloque sólido</value></data>
+</root>
