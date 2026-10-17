@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using SScreentify.App.Diagnostics;
 using SScreentify.App.Export;
 using SScreentify.App.Overlay;
 using SScreentify.App.Services;
@@ -32,6 +33,18 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        var exportIcon = Array.IndexOf(e.Args, "--export-icon");
+        if (exportIcon >= 0 && exportIcon + 1 < e.Args.Length)
+        {
+            IconExport.Write(e.Args[exportIcon + 1]);
+            Shutdown();
+            return;
+        }
+        PerfTrace.Enabled = e.Args.Contains("--perf");
+        // Measured (README): GPU rendering keeps ~70 MB of driver memory alive after the first capture while software
+        // rendering stays under the 60 MB idle target with the same ~30 ms open time. --gpu-render opts back in.
+        if (!e.Args.Contains("--gpu-render")) System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+
         _singleInstance = new Mutex(initiallyOwned: true, @"Local\sScreentify.SingleInstance", out var createdNew);
         if (!createdNew)
         {
@@ -58,6 +71,12 @@ public partial class App : Application
         _tray.OptionsRequested += ShowOptions;
         _tray.AboutRequested += ShowAbout;
         _tray.ExitRequested += Shutdown;
+        PerfTrace.Mark("tray-ready");
+        if (PerfTrace.Enabled)
+        {
+            _overlay.SessionClosed += () => ScheduleMemorySample("idle-memory");
+            ScheduleMemorySample("startup-memory");
+        }
 
         Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () =>
         {
@@ -147,9 +166,17 @@ public partial class App : Application
 
     private void OnHotkey(HotkeyId id)
     {
+        PerfTrace.Mark("hotkey", id.ToString());
         if (id == HotkeyId.Main) StartCapture();
         else if (id == HotkeyId.SaveFullscreen) _export?.SaveFullscreenInstant();
     }
 
     private void StartCapture() => _overlay?.Open();
+
+    private static void ScheduleMemorySample(string name)
+    {
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(10) };
+        timer.Tick += (_, _) => { timer.Stop(); PerfTrace.Memory(name); };
+        timer.Start();
+    }
 }

@@ -2,6 +2,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using SScreentify.App.Capture;
+using SScreentify.App.Diagnostics;
 using SScreentify.App.Native;
 using SScreentify.App.Rendering;
 using SScreentify.Core.Geometry;
@@ -68,6 +69,7 @@ public sealed class OverlayController
         {
             var settings = _settings();
             var capture = ScreenCapture.CaptureVirtualScreen(settings.CaptureCursor);
+            PerfTrace.Mark("captured", $"{capture.VirtualBounds.Width}x{capture.VirtualBounds.Height}");
             if (!OverlayLayout.WindowRects(capture.Monitors).SequenceEqual(_windows.Select(w => w.Monitor.Bounds)))
                 RebuildWindows();
 
@@ -93,6 +95,7 @@ public sealed class OverlayController
             }
             UpdateChrome();
             ActivateWindowUnderCursor();
+            if (PerfTrace.Enabled) MarkFirstFrame();
             SessionOpened?.Invoke(session);
         }
         catch
@@ -122,8 +125,29 @@ public sealed class OverlayController
             _tools = null;
             _saveSettings(session.ApplyTo(_settings()));
             SessionClosed?.Invoke();
+            // The capture lives mostly in native WIC/WPF memory that the GC does not feel; reclaim it once idle.
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, ReleaseCaptureMemory);
         }
         _gate.Exit();
+    }
+
+    private void ReleaseCaptureMemory()
+    {
+        if (Session is not null) return;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
+
+    private static void MarkFirstFrame()
+    {
+        EventHandler? handler = null;
+        handler = (_, _) =>
+        {
+            System.Windows.Media.CompositionTarget.Rendering -= handler;
+            PerfTrace.Mark("rendered");
+        };
+        System.Windows.Media.CompositionTarget.Rendering += handler;
     }
 
     /// <summary>Commits any text being typed so exports include it.</summary>

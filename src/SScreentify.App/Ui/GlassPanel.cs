@@ -40,6 +40,8 @@ public sealed class GlassPanel : Border
         set => _frame.Child = value;
     }
 
+    public bool HasBackdrop => _backdrop.Fill is not null;
+
     /// <summary>Shows <paramref name="viewbox"/> (pixels of <paramref name="backdrop"/>) blurred behind the panel.</summary>
     public void SetBackdrop(BitmapSource? backdrop, Rect viewbox)
     {

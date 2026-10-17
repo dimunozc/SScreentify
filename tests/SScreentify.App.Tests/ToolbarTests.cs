@@ -71,4 +71,24 @@ public class ToolbarTests
         Assert.Equal(new[] { "#F43F5E", "#F97316", "#FACC15", "#22C55E", "#3B82F6", "#A855F7", "#FFFFFF", "#111827" }, ColorPalette.Presets);
         Assert.All(ColorPalette.Presets, p => Rgba.Parse(p));
     }
+
+    [Fact]
+    public void ChromeDetach_ReleasesCaptureBackdrops()
+    {
+        StaRunner.Run(() =>
+        {
+            var session = NewSession();
+            var chrome = new ChromeController();
+            chrome.Attach(session);
+            foreach (var panel in new[] { chrome.Tools.Panel, chrome.Actions.Panel, chrome.Censor.Panel })
+                panel.SetBackdrop(session.Image, new System.Windows.Rect(0, 0, 10, 10));
+
+            chrome.Detach();
+
+            Assert.False(chrome.Tools.Panel.HasBackdrop);
+            Assert.False(chrome.Actions.Panel.HasBackdrop);
+            Assert.False(chrome.Censor.Panel.HasBackdrop);
+            Assert.Null(chrome.Tools.Session);
+        });
+    }
 }

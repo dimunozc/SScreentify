@@ -54,6 +54,8 @@ public sealed class ChromeController
     {
         Tools.Session = null;
         Censor.Session = null;
+        // The backdrops reference the capture bitmap; drop them so it can be freed.
+        foreach (var panel in new[] { Tools.Panel, Actions.Panel, Censor.Panel }) panel.SetBackdrop(null, Rect.Empty);
         _colorPopup.IsOpen = false;
         Hide();
         MoveTo(null);
