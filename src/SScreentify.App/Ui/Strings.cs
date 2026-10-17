@@ -45,6 +45,29 @@ public static class Strings
     public static string CensorPixelate => Get(nameof(CensorPixelate));
     public static string CensorBlur => Get(nameof(CensorBlur));
     public static string CensorSolid => Get(nameof(CensorSolid));
+    public static string OptionsTitle => Get(nameof(OptionsTitle));
+    public static string TabGeneral => Get(nameof(TabGeneral));
+    public static string TabHotkeys => Get(nameof(TabHotkeys));
+    public static string TabFormats => Get(nameof(TabFormats));
+    public static string OptShowNotifications => Get(nameof(OptShowNotifications));
+    public static string OptCaptureCursor => Get(nameof(OptCaptureCursor));
+    public static string OptKeepSelection => Get(nameof(OptKeepSelection));
+    public static string OptStartWithWindows => Get(nameof(OptStartWithWindows));
+    public static string OptLanguage => Get(nameof(OptLanguage));
+    public static string LanguageSpanish => Get(nameof(LanguageSpanish));
+    public static string HotkeyMain => Get(nameof(HotkeyMain));
+    public static string HotkeySaveFullscreen => Get(nameof(HotkeySaveFullscreen));
+    public static string HotkeyHint => Get(nameof(HotkeyHint));
+    public static string OptFormat => Get(nameof(OptFormat));
+    public static string OptJpegQuality => Get(nameof(OptJpegQuality));
+    public static string OptDefaultFolder => Get(nameof(OptDefaultFolder));
+    public static string ButtonBrowse => Get(nameof(ButtonBrowse));
+    public static string ButtonOk => Get(nameof(ButtonOk));
+    public static string ButtonCancel => Get(nameof(ButtonCancel));
+    public static string AboutTitle => Get(nameof(AboutTitle));
+    public static string AboutText => Get(nameof(AboutText));
+    public static string AboutVersion => Get(nameof(AboutVersion));
+    public static string PaletteCustom => Get(nameof(PaletteCustom));
 
     private static string Get(string key) =>
         Resources.GetString(key, Culture) ?? throw new MissingManifestResourceException(key);

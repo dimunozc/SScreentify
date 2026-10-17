@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using SScreentify.App.Export;
 using SScreentify.App.Overlay;
@@ -13,20 +14,19 @@ namespace SScreentify.App;
 
 public partial class App : Application
 {
+    private readonly ToastService _toasts = new();
     private Mutex? _singleInstance;
     private SettingsStore _store = null!;
     private TrayIcon? _tray;
     private HotkeyService? _hotkeys;
     private OverlayController? _overlay;
     private ExportActions? _export;
-    private readonly ToastService _toasts = new();
+    private OptionsWindow? _options;
+    private AboutWindow? _about;
+    private HotkeySetting? _failedHotkey;
+    private bool _printScreenTakenBySnipping;
 
     internal AppSettings Settings { get; private set; } = new();
-
-    /// <summary>Problems found at startup, shown once notifications exist.</summary>
-    internal bool SettingsWereCorrupt { get; private set; }
-    internal HotkeySetting? FailedHotkey { get; private set; }
-    internal bool PrintScreenTakenBySnipping { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -44,8 +44,6 @@ public partial class App : Application
         _store = new SettingsStore(AppPaths.SettingsFile);
         var loaded = _store.Load();
         Settings = loaded.Settings;
-        SettingsWereCorrupt = loaded.WasCorrupt;
-        if (SettingsWereCorrupt) Debug.WriteLine(Strings.SettingsCorrupt);
 
         _overlay = new OverlayController(() => Settings, SaveSettings);
         _overlay.Prewarm();
@@ -55,9 +53,17 @@ public partial class App : Application
         _hotkeys.Pressed += OnHotkey;
         ApplyHotkeys();
 
-        _tray = new TrayIcon(string.Format(Strings.TrayTooltip, HotkeyRules.Display(Settings.MainHotkey)));
+        _tray = new TrayIcon(TrayTooltip());
         _tray.CaptureRequested += StartCapture;
+        _tray.OptionsRequested += ShowOptions;
+        _tray.AboutRequested += ShowAbout;
         _tray.ExitRequested += Shutdown;
+
+        Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () =>
+        {
+            if (loaded.WasCorrupt) _toasts.Show(Strings.SettingsCorrupt, isError: true);
+            ShowHotkeyNotices();
+        });
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -77,15 +83,67 @@ public partial class App : Application
 
     private void ApplyHotkeys()
     {
-        FailedHotkey = null;
-        if (!_hotkeys!.Register(HotkeyId.Main, Settings.MainHotkey)) FailedHotkey = Settings.MainHotkey;
-        if (!_hotkeys.Register(HotkeyId.SaveFullscreen, Settings.SaveFullscreenHotkey)) FailedHotkey ??= Settings.SaveFullscreenHotkey;
+        _failedHotkey = null;
+        if (!_hotkeys!.Register(HotkeyId.Main, Settings.MainHotkey)) _failedHotkey = Settings.MainHotkey;
+        if (!_hotkeys.Register(HotkeyId.SaveFullscreen, Settings.SaveFullscreenHotkey)) _failedHotkey ??= Settings.SaveFullscreenHotkey;
 
         var main = Settings.MainHotkey;
         var usesBarePrintScreen = main.Enabled && main.Modifiers == HotkeyModifiers.None && main.VirtualKey == HotkeyRules.VkSnapshot;
-        PrintScreenTakenBySnipping = usesBarePrintScreen && SnippingToolConflict.IsPrintScreenTaken(
+        _printScreenTakenBySnipping = usesBarePrintScreen && SnippingToolConflict.IsPrintScreenTaken(
             Registry.GetValue(@"HKEY_CURRENT_USER\Control Panel\Keyboard", "PrintScreenKeyForSnippingEnabled", null));
     }
+
+    private void ShowHotkeyNotices()
+    {
+        if (_printScreenTakenBySnipping)
+            _toasts.Show(Strings.ToastSnippingConflict, buttonText: Strings.ButtonOpenWindowsSettings, isError: true,
+                onButton: () => Process.Start(new ProcessStartInfo("ms-settings:easeofaccess-keyboard") { UseShellExecute = true }));
+        else if (_failedHotkey is { } failed)
+            _toasts.Show(string.Format(Strings.ToastHotkeyFailed, HotkeyRules.Display(failed)), onClick: ShowOptions, isError: true);
+    }
+
+    private void ShowOptions()
+    {
+        if (_options is not null)
+        {
+            _options.Activate();
+            return;
+        }
+
+        // While recording shortcuts the global hotkeys must not fire.
+        _hotkeys!.Unregister(HotkeyId.Main);
+        _hotkeys.Unregister(HotkeyId.SaveFullscreen);
+        _options = new OptionsWindow(Settings);
+        try
+        {
+            if (_options.ShowDialog() == true && _options.Result is { } result)
+            {
+                SaveSettings(result);
+                if (Environment.ProcessPath is { } exe) AutoStart.ForCurrentUser().Apply(result.StartWithWindows, exe);
+            }
+        }
+        finally
+        {
+            _options = null;
+            ApplyHotkeys();
+            _tray?.SetTooltip(TrayTooltip());
+            ShowHotkeyNotices();
+        }
+    }
+
+    private void ShowAbout()
+    {
+        if (_about is not null)
+        {
+            _about.Activate();
+            return;
+        }
+        _about = new AboutWindow();
+        _about.Closed += (_, _) => _about = null;
+        _about.Show();
+    }
+
+    private string TrayTooltip() => string.Format(Strings.TrayTooltip, HotkeyRules.Display(Settings.MainHotkey));
 
     private void OnHotkey(HotkeyId id)
     {

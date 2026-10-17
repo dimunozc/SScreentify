@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SScreentify.App.Capture;
@@ -21,7 +22,9 @@ public class VisualSnapshotTests
 {
     internal static ResourceDictionary LoadTheme()
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
+        // pack:// URIs resolve only once a WPF Application exists in the process.
+        lock (typeof(VisualSnapshotTests))
+            if (Application.Current is null) _ = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         return new ResourceDictionary { Source = new Uri("pack://application:,,,/sScreentify;component/Ui/Theme.xaml") };
     }
 
@@ -100,5 +103,47 @@ public class VisualSnapshotTests
             using var file = File.Create(Path.Combine(dir, "chrome.png"));
             encoder.Save(file);
         });
+    }
+
+    [Fact]
+    public void Windows_RenderForReview()
+    {
+        StaRunner.Run(() =>
+        {
+            var theme = LoadTheme();
+            Save(Snapshot(new OptionsWindow(new AppSettings { Format = ImageFormat.Jpeg }), theme, 560), "options.png");
+            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastSaved, @"C:\Users\Diego\Pictures\sScreentify\Captura_2026-10-17_16-52-03.png"), () => { }, null, null, false), theme, 400), "toast.png");
+            Save(Snapshot(new ToastWindow(Strings.ToastSnippingConflict, null, Strings.ButtonOpenWindowsSettings, () => { }, true), theme, 400), "toast-error.png");
+            Save(Snapshot(new AboutWindow(), theme, 380), "about.png");
+        });
+    }
+
+    private static RenderTargetBitmap Snapshot(Window window, ResourceDictionary theme, double width)
+    {
+        var content = (FrameworkElement)window.Content;
+        window.Content = null;
+        var root = new Border { Background = window.Background ?? Brushes.Transparent, Child = content, Width = width };
+        TextElement.SetForeground(root, window.Foreground);
+        TextElement.SetFontFamily(root, window.FontFamily);
+        TextElement.SetFontSize(root, window.FontSize);
+        root.Resources.MergedDictionaries.Add(theme);
+        root.Measure(new Size(width, double.PositiveInfinity));
+        root.Arrange(new Rect(root.DesiredSize));
+        root.UpdateLayout();
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(root.ActualWidth), (int)Math.Ceiling(root.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(root);
+        return bitmap;
+    }
+
+    private static void Save(BitmapSource bitmap, string name)
+    {
+        Assert.True(bitmap.PixelHeight > 20);
+        var dir = Environment.GetEnvironmentVariable("SSCREENTIFY_SNAPSHOT_DIR");
+        if (string.IsNullOrEmpty(dir)) return;
+        Directory.CreateDirectory(dir);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using var file = File.Create(Path.Combine(dir, name));
+        encoder.Save(file);
     }
 }

@@ -27,7 +27,7 @@ public sealed class ColorPalette : UserControl
             grid.Children.Add(ToolsBar.Button(swatch, hex, () => ColorChosen?.Invoke(c)));
         }
 
-        var custom = new Button { Content = "Personalizado…", Margin = new Thickness(1, 4, 1, 0), Height = 26, Width = double.NaN };
+        var custom = new Button { Content = Strings.PaletteCustom, Margin = new Thickness(1, 4, 1, 0), Height = 26, Width = double.NaN };
         custom.SetResourceReference(StyleProperty, "GlassButton");
         custom.Width = double.NaN;
         custom.SetResourceReference(Control.FontFamilyProperty, "UiFont");

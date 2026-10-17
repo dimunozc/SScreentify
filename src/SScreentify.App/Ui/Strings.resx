@@ -39,4 +39,27 @@
   <data name="CensorPixelate" xml:space="preserve"><value>Pixelado</value></data>
   <data name="CensorBlur" xml:space="preserve"><value>Desenfoque</value></data>
   <data name="CensorSolid" xml:space="preserve"><value>Bloque sólido</value></data>
+  <data name="OptionsTitle" xml:space="preserve"><value>Opciones de sScreentify</value></data>
+  <data name="TabGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="TabHotkeys" xml:space="preserve"><value>Atajos</value></data>
+  <data name="TabFormats" xml:space="preserve"><value>Formatos</value></data>
+  <data name="OptShowNotifications" xml:space="preserve"><value>Mostrar avisos al copiar y guardar</value></data>
+  <data name="OptCaptureCursor" xml:space="preserve"><value>Incluir el cursor en la captura</value></data>
+  <data name="OptKeepSelection" xml:space="preserve"><value>Recordar la última selección</value></data>
+  <data name="OptStartWithWindows" xml:space="preserve"><value>Iniciar con Windows</value></data>
+  <data name="OptLanguage" xml:space="preserve"><value>Idioma</value></data>
+  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
+  <data name="HotkeyMain" xml:space="preserve"><value>Atajo general</value></data>
+  <data name="HotkeySaveFullscreen" xml:space="preserve"><value>Guardar la pantalla completa al instante</value></data>
+  <data name="HotkeyHint" xml:space="preserve"><value>Haz clic en el campo y pulsa la combinación. Retroceso lo borra.</value></data>
+  <data name="OptFormat" xml:space="preserve"><value>Formato por defecto</value></data>
+  <data name="OptJpegQuality" xml:space="preserve"><value>Calidad JPG</value></data>
+  <data name="OptDefaultFolder" xml:space="preserve"><value>Carpeta por defecto</value></data>
+  <data name="ButtonBrowse" xml:space="preserve"><value>Examinar…</value></data>
+  <data name="ButtonOk" xml:space="preserve"><value>Aceptar</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Acerca de sScreentify</value></data>
+  <data name="AboutText" xml:space="preserve"><value>Herramienta de capturas de pantalla sin conexión.</value></data>
+  <data name="AboutVersion" xml:space="preserve"><value>Versión {0}</value></data>
+  <data name="PaletteCustom" xml:space="preserve"><value>Personalizado…</value></data>
 </root>
