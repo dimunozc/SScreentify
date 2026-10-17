@@ -1,8 +1,12 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SScreentify.App.Native;
+using SScreentify.App.Rendering;
+using SScreentify.App.Ui;
 using SScreentify.Core.Geometry;
 
 namespace SScreentify.App.Overlay;
@@ -11,6 +15,8 @@ namespace SScreentify.App.Overlay;
 public partial class OverlayWindow : Window
 {
     private readonly OverlayController _controller;
+    private readonly DispatcherTimer _indicatorTimer = new() { Interval = TimeSpan.FromMilliseconds(800) };
+    private readonly Border _indicator;
 
     public OverlayWindow(OverlayController controller, MonitorInfo monitor)
     {
@@ -18,6 +24,15 @@ public partial class OverlayWindow : Window
         Monitor = monitor;
         InitializeComponent();
         Adorner.MonitorBounds = monitor.Bounds;
+        Annotations.MonitorBounds = monitor.Bounds;
+        _indicator = new Border
+        {
+            Background = Palette.Pill, CornerRadius = new CornerRadius(6), Padding = new Thickness(8, 3, 8, 3),
+            Visibility = Visibility.Collapsed, IsHitTestVisible = false,
+            Child = new TextBlock { Foreground = Palette.Text, FontFamily = Palette.Font, FontSize = 12, FontWeight = FontWeights.SemiBold },
+        };
+        Chrome.Children.Add(_indicator);
+        _indicatorTimer.Tick += (_, _) => { _indicatorTimer.Stop(); _indicator.Visibility = Visibility.Collapsed; };
         DpiChanged += (_, _) => Dispatcher.BeginInvoke(Place);
     }
 
@@ -33,21 +48,28 @@ public partial class OverlayWindow : Window
         Place();
     }
 
-    public void Attach(CaptureSession session)
+    public void Attach(CaptureSession session, ToolController tools, CensorPatchCache patches)
     {
         Session = session;
         Adorner.Session = session;
+        Annotations.Session = session;
+        Annotations.Tools = tools;
+        Annotations.Patches = patches;
         CaptureImage.Source = session.Image;
         UpdateImageTransform();
-        Adorner.InvalidateVisual();
+        Redraw();
     }
 
     public void Detach()
     {
         Session = null;
         Adorner.Session = null;
+        Annotations.Session = null;
+        Annotations.Tools = null;
+        Annotations.Patches = null;
         CaptureImage.Source = null;
-        AnnotationHost.Children.Clear();
+        EditorHost.Children.Clear();
+        _indicator.Visibility = Visibility.Collapsed;
     }
 
     public void ShowOverlay()
@@ -56,7 +78,24 @@ public partial class OverlayWindow : Window
         Place();
     }
 
-    public void Redraw() => Adorner.InvalidateVisual();
+    public void Redraw()
+    {
+        Adorner.InvalidateVisual();
+        Annotations.InvalidateVisual();
+    }
+
+    public void RedrawAnnotations() => Annotations.InvalidateVisual();
+
+    /// <summary>Shows a short-lived value pill (stroke width, font size) next to the given physical point.</summary>
+    public void ShowIndicator(string text, PointD near)
+    {
+        ((TextBlock)_indicator.Child).Text = text;
+        Canvas.SetLeft(_indicator, (near.X - Monitor.Bounds.X) / Scale + 16);
+        Canvas.SetTop(_indicator, (near.Y - Monitor.Bounds.Y) / Scale + 16);
+        _indicator.Visibility = Visibility.Visible;
+        _indicatorTimer.Stop();
+        _indicatorTimer.Start();
+    }
 
     /// <summary>Physical capture coordinates → this window's DIPs.</summary>
     public Matrix PhysicalToDip

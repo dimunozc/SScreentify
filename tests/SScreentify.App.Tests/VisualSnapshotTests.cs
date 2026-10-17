@@ -4,6 +4,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SScreentify.App.Capture;
 using SScreentify.App.Overlay;
+using SScreentify.App.Rendering;
+using SScreentify.Core.Annotations;
 using SScreentify.App.Ui;
 using SScreentify.Core.Geometry;
 using SScreentify.Core.Imaging;
@@ -51,10 +53,19 @@ public class VisualSnapshotTests
             var selection = new PixelRect(120, 70, 300, 190);
             session.Selection.Set(selection);
             session.Tool = ToolKind.Arrow;
+            var red = Rgba.Parse("#F43F5E");
+            var label = AnnotationRenderer.MeasureText("¡aquí!", 20);
+            session.Document.Add(new ShapeAnnotation(Guid.NewGuid(), red, 4, new RectD(150, 118, 120, 46), IsEllipse: false));
+            session.Document.Add(new SegmentAnnotation(Guid.NewGuid(), red, 4, new PointD(355, 120), new PointD(290, 152), HasArrowHead: true));
+            session.Document.Add(new TextAnnotation(Guid.NewGuid(), red, new PointD(330, 90), "¡aquí!", 20, new RectD(330, 90, label.Width, label.Height)));
+            session.Document.Add(new PenAnnotation(Guid.NewGuid(), Rgba.Parse("#FACC15"), 4, new[] { new PointD(142, 202), new PointD(292, 202) }, IsMarker: true));
+            session.Document.Add(new CensorAnnotation(Guid.NewGuid(), red, new RectD(300, 190, 100, 50), CensorStyle.Pixelate));
+            session.Document.Add(new CensorAnnotation(Guid.NewGuid(), red, new RectD(150, 220, 80, 30), CensorStyle.Blur));
 
             var root = new Grid { Width = w, Height = h };
             root.Resources.MergedDictionaries.Add(LoadTheme());
             root.Children.Add(new Image { Source = session.Image, Stretch = Stretch.None });
+            root.Children.Add(new AnnotationLayer { Session = session, MonitorBounds = bounds, Patches = new CensorPatchCache(capture.Pixels, bounds) });
             root.Children.Add(new SelectionAdorner { Session = session, MonitorBounds = bounds });
             var chrome = new Canvas();
             root.Children.Add(chrome);

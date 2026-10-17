@@ -3,6 +3,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using SScreentify.App.Capture;
 using SScreentify.App.Native;
+using SScreentify.App.Rendering;
 using SScreentify.Core.Geometry;
 using SScreentify.Core.Settings;
 
@@ -17,9 +18,12 @@ public sealed class OverlayController
     private readonly Action<AppSettings> _saveSettings;
     private readonly CaptureGate _gate = new();
     private readonly List<OverlayWindow> _windows = new();
+    private readonly ChromeController _chrome = new();
+    private readonly TextEditorHost _editor = new();
+    private ToolController? _tools;
     private bool _creating;
     private bool _dragging;
-    private readonly ChromeController _chrome = new();
+    private bool _drawing;
 
     public OverlayController(Func<AppSettings> settings, Action<AppSettings> saveSettings)
     {
@@ -37,12 +41,11 @@ public sealed class OverlayController
     public Dispatcher Dispatcher { get; }
     public CaptureSession? Session { get; private set; }
     public IReadOnlyList<OverlayWindow> Windows => _windows;
+    public ChromeController Chrome => _chrome;
 
     public event Action<CaptureSession>? SessionOpened;
     public event Action? SessionClosed;
     public event Action<CaptureSession>? CopyRequested, SaveRequested, PrintRequested;
-
-    public ChromeController Chrome => _chrome;
 
     public void Prewarm()
     {
@@ -66,16 +69,22 @@ public sealed class OverlayController
 
             var session = new CaptureSession(capture, settings);
             Session = session;
+            _tools = new ToolController(session);
+            _tools.Changed += RedrawAnnotations;
+            _tools.TextEditRequested += BeginTextEdit;
+            _tools.IndicatorRequested += ShowIndicator;
             session.Selection.Changed += OnSelectionChanged;
-            session.ToolChanged += RedrawAll;
+            session.ToolChanged += OnToolChanged;
+            session.Document.Changed += RedrawAnnotations;
             _chrome.Attach(session);
             if (settings.KeepSelection && settings.LastSelection is { } last
                 && capture.VirtualBounds.Intersect(last) == last)
                 session.Selection.Set(last);
 
+            var patches = new CensorPatchCache(capture.Pixels, capture.VirtualBounds);
             foreach (var window in _windows)
             {
-                window.Attach(session);
+                window.Attach(session, _tools, patches);
                 window.ShowOverlay();
             }
             UpdateChrome();
@@ -93,7 +102,8 @@ public sealed class OverlayController
     {
         var session = Session;
         Session = null;
-        _creating = _dragging = false;
+        _creating = _dragging = _drawing = false;
+        _editor.Cancel();
         _chrome.Detach();
         foreach (var window in _windows)
         {
@@ -103,24 +113,42 @@ public sealed class OverlayController
         if (session is not null)
         {
             session.Selection.Changed -= OnSelectionChanged;
-            session.ToolChanged -= RedrawAll;
+            session.ToolChanged -= OnToolChanged;
+            session.Document.Changed -= RedrawAnnotations;
+            _tools = null;
             _saveSettings(session.ApplyTo(_settings()));
             SessionClosed?.Invoke();
         }
         _gate.Exit();
     }
 
+    /// <summary>Commits any text being typed so exports include it.</summary>
+    public void FinishEditing() => _editor.Commit();
+
     internal void OnMouseDown(OverlayWindow window, PointD p, MouseButton button, ModifierKeys modifiers)
     {
         if (Session is not { } s) return;
         var point = ToPixel(p);
+
+        if (_editor.IsEditing)
+        {
+            _editor.Commit();
+            return;
+        }
 
         if (button == MouseButton.Right)
         {
             if (s.Selection.Rect is not { } r || !r.Contains(point)) Close();
             return;
         }
-        if (button != MouseButton.Left || s.Tool != ToolKind.None) return;
+        if (button != MouseButton.Left) return;
+
+        if (s.Tool != ToolKind.None)
+        {
+            _drawing = true;
+            _tools?.OnMouseDown(p, modifiers);
+            return;
+        }
 
         var handle = s.Selection.HitTest(point, HandleRadius(window));
         if (handle == Handle.None)
@@ -141,14 +169,27 @@ public sealed class OverlayController
     {
         if (Session is not { } s) return;
         var point = ToPixel(p);
-        if (_creating) s.Selection.UpdateCreate(point);
+        if (_drawing) _tools?.OnMouseMove(p, modifiers);
+        else if (_creating) s.Selection.UpdateCreate(point);
         else if (_dragging) s.Selection.UpdateDrag(point);
-        else if (s.Tool == ToolKind.None) window.Cursor = CursorFor(s.Selection.HitTest(point, HandleRadius(window)));
+        else window.Cursor = s.Tool switch
+        {
+            ToolKind.None => CursorFor(s.Selection.HitTest(point, HandleRadius(window))),
+            ToolKind.Text => Cursors.IBeam,
+            ToolKind.Select => s.Document.HitTest(p, Math.Max(4, s.Thickness)) is null ? Cursors.Arrow : Cursors.SizeAll,
+            _ => Cursors.Cross,
+        };
     }
 
     internal void OnMouseUp(OverlayWindow window, PointD p, MouseButton button, ModifierKeys modifiers)
     {
         if (Session is not { } s || button != MouseButton.Left) return;
+        if (_drawing)
+        {
+            _drawing = false;
+            _tools?.OnMouseUp(p, modifiers);
+            return;
+        }
         if (_creating)
         {
             _creating = false;
@@ -164,14 +205,25 @@ public sealed class OverlayController
 
     internal void OnMouseWheel(OverlayWindow window, int delta)
     {
+        if (Session is { Tool: not ToolKind.None }) _tools?.OnWheel(delta);
     }
 
     internal bool OnKeyDown(OverlayWindow window, Key key, ModifierKeys modifiers)
     {
         if (Session is not { } s) return false;
+
+        if (_editor.IsEditing)
+        {
+            // The text box owns typing; Esc confirms the text instead of closing the selector.
+            if (key != Key.Escape) return false;
+            _editor.Commit();
+            return true;
+        }
+
+        if (_tools?.OnKey(key, modifiers) == true) return true;
+
         var ctrl = modifiers.HasFlag(ModifierKeys.Control);
         var shift = modifiers.HasFlag(ModifierKeys.Shift);
-
         switch (key)
         {
             case Key.Escape:
@@ -198,6 +250,23 @@ public sealed class OverlayController
         s.Selection.Set(s.Selection.Rect == under.Bounds ? s.Capture.VirtualBounds : under.Bounds);
     }
 
+    private void BeginTextEdit(PointD p)
+    {
+        if (Session is not { } s || _tools is not { } tools) return;
+        _drawing = false;
+        _editor.Begin(WindowAt(p), p, s, tools.CommitText);
+    }
+
+    private void ShowIndicator(string text)
+    {
+        User32.GetCursorPos(out var cursor);
+        var p = new PointD(cursor.X, cursor.Y);
+        WindowAt(p).ShowIndicator(text, p);
+    }
+
+    private OverlayWindow WindowAt(PointD p) =>
+        _windows.FirstOrDefault(w => w.Monitor.Bounds.Contains(ToPixel(p))) ?? _windows[0];
+
     private void Rebuild()
     {
         Close();
@@ -217,6 +286,12 @@ public sealed class OverlayController
         if (!_creating && !_dragging) UpdateChrome();
     }
 
+    private void OnToolChanged()
+    {
+        _editor.Commit();
+        RedrawAll();
+    }
+
     private void UpdateChrome()
     {
         if (Session is { } s) _chrome.Update(s, _windows);
@@ -225,6 +300,11 @@ public sealed class OverlayController
     private void RedrawAll()
     {
         foreach (var window in _windows) window.Redraw();
+    }
+
+    private void RedrawAnnotations()
+    {
+        foreach (var window in _windows) window.RedrawAnnotations();
     }
 
     private void ActivateWindowUnderCursor()

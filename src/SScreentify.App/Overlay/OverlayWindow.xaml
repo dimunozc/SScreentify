@@ -9,8 +9,9 @@
         <Canvas x:Name="ImageHost">
             <Image x:Name="CaptureImage" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
         </Canvas>
-        <Canvas x:Name="AnnotationHost" />
+        <local:AnnotationLayer x:Name="Annotations" />
         <local:SelectionAdorner x:Name="Adorner" />
+        <Canvas x:Name="EditorHost" x:FieldModifier="public" />
         <Canvas x:Name="Chrome" x:FieldModifier="public" />
     </Grid>
 </Window>
