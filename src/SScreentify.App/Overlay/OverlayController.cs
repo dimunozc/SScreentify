@@ -19,6 +19,7 @@ public sealed class OverlayController
     private readonly List<OverlayWindow> _windows = new();
     private bool _creating;
     private bool _dragging;
+    private readonly ChromeController _chrome = new();
 
     public OverlayController(Func<AppSettings> settings, Action<AppSettings> saveSettings)
     {
@@ -27,6 +28,10 @@ public sealed class OverlayController
         Dispatcher = Dispatcher.CurrentDispatcher;
         // Raised on a system thread: marshal back to the UI thread.
         SystemEvents.DisplaySettingsChanged += (_, _) => Dispatcher.BeginInvoke(Rebuild);
+        _chrome.Actions.CopyRequested += () => { if (Session is { } s) CopyRequested?.Invoke(s); };
+        _chrome.Actions.SaveRequested += () => { if (Session is { } s) SaveRequested?.Invoke(s); };
+        _chrome.Actions.PrintRequested += () => { if (Session is { } s) PrintRequested?.Invoke(s); };
+        _chrome.Actions.CloseRequested += Close;
     }
 
     public Dispatcher Dispatcher { get; }
@@ -35,6 +40,9 @@ public sealed class OverlayController
 
     public event Action<CaptureSession>? SessionOpened;
     public event Action? SessionClosed;
+    public event Action<CaptureSession>? CopyRequested, SaveRequested, PrintRequested;
+
+    public ChromeController Chrome => _chrome;
 
     public void Prewarm()
     {
@@ -58,8 +66,9 @@ public sealed class OverlayController
 
             var session = new CaptureSession(capture, settings);
             Session = session;
-            session.Selection.Changed += RedrawAll;
+            session.Selection.Changed += OnSelectionChanged;
             session.ToolChanged += RedrawAll;
+            _chrome.Attach(session);
             if (settings.KeepSelection && settings.LastSelection is { } last
                 && capture.VirtualBounds.Intersect(last) == last)
                 session.Selection.Set(last);
@@ -69,6 +78,7 @@ public sealed class OverlayController
                 window.Attach(session);
                 window.ShowOverlay();
             }
+            UpdateChrome();
             ActivateWindowUnderCursor();
             SessionOpened?.Invoke(session);
         }
@@ -84,6 +94,7 @@ public sealed class OverlayController
         var session = Session;
         Session = null;
         _creating = _dragging = false;
+        _chrome.Detach();
         foreach (var window in _windows)
         {
             window.Hide();
@@ -91,7 +102,7 @@ public sealed class OverlayController
         }
         if (session is not null)
         {
-            session.Selection.Changed -= RedrawAll;
+            session.Selection.Changed -= OnSelectionChanged;
             session.ToolChanged -= RedrawAll;
             _saveSettings(session.ApplyTo(_settings()));
             SessionClosed?.Invoke();
@@ -115,11 +126,13 @@ public sealed class OverlayController
         if (handle == Handle.None)
         {
             _creating = true;
+            _chrome.Hide();
             s.Selection.BeginCreate(point);
         }
         else
         {
             _dragging = true;
+            _chrome.Hide();
             s.Selection.BeginDrag(handle, point);
         }
     }
@@ -146,6 +159,7 @@ public sealed class OverlayController
             _dragging = false;
             s.Selection.EndDrag();
         }
+        UpdateChrome();
     }
 
     internal void OnMouseWheel(OverlayWindow window, int delta)
@@ -195,6 +209,17 @@ public sealed class OverlayController
         foreach (var window in _windows) window.Close();
         _windows.Clear();
         Prewarm();
+    }
+
+    private void OnSelectionChanged()
+    {
+        RedrawAll();
+        if (!_creating && !_dragging) UpdateChrome();
+    }
+
+    private void UpdateChrome()
+    {
+        if (Session is { } s) _chrome.Update(s, _windows);
     }
 
     private void RedrawAll()

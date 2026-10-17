@@ -47,7 +47,6 @@ public partial class OverlayWindow : Window
         Session = null;
         Adorner.Session = null;
         CaptureImage.Source = null;
-        Chrome.Children.Clear();
         AnnotationHost.Children.Clear();
     }
 

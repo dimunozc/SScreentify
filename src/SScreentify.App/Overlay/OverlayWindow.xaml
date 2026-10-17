@@ -11,6 +11,6 @@
         </Canvas>
         <Canvas x:Name="AnnotationHost" />
         <local:SelectionAdorner x:Name="Adorner" />
-        <Canvas x:Name="Chrome" />
+        <Canvas x:Name="Chrome" x:FieldModifier="public" />
     </Grid>
 </Window>
