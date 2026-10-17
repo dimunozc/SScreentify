@@ -14,7 +14,7 @@ public static class Icons
     public static readonly Geometry Line = Parse("M5,19 L19,5");
     public static readonly Geometry Arrow = Parse("M5,19 L19,5 M9,5 L19,5 L19,15");
     public static readonly Geometry Rectangle = Parse("M4,6 H20 V18 H4 Z");
-    public static readonly Geometry Ellipse = new EllipseGeometry(new Point(12, 12), 8, 8);
+    public static readonly Geometry Ellipse = Frozen(new EllipseGeometry(new Point(12, 12), 8, 8));
     public static readonly Geometry Marker = Parse("M4,20 H14 M7,15 L15,7 L19,11 L11,19 H7 Z");
     public static readonly Geometry Text = Parse("M6,6 H18 M12,6 V19 M9,19 H15");
     public static readonly Geometry Censor = Parse("M4,6 H20 V18 H4 Z M4,12 H20 M9.33,6 V18 M14.67,6 V18");
@@ -48,6 +48,12 @@ public static class Icons
             RelativeSource = new System.Windows.Data.RelativeSource(System.Windows.Data.RelativeSourceMode.FindAncestor, typeof(Control), 1),
         });
         return path;
+    }
+
+    private static Geometry Frozen(Geometry g)
+    {
+        g.Freeze();
+        return g;
     }
 
     private static Geometry Parse(string data)
