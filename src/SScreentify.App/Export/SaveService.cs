@@ -10,13 +10,23 @@ public static class SaveService
 {
     private static readonly ImageFormat[] FilterOrder = { ImageFormat.Png, ImageFormat.Jpeg, ImageFormat.Bmp };
 
-    /// <summary>The last folder if it still exists; otherwise the default folder (created if needed).</summary>
-    public static string ResolveInitialFolder(string? lastFolder, string? defaultFolder)
+    /// <summary>The last folder if it still exists; otherwise the default folder (created if needed);
+    /// if that cannot be created (unplugged drive, no permission), the fallback (PicturessScreentify).</summary>
+    public static string ResolveInitialFolder(string? lastFolder, string? defaultFolder, string? fallback = null)
     {
         if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder)) return lastFolder;
-        var folder = string.IsNullOrEmpty(defaultFolder) ? AppPaths.DefaultPicturesFolder : defaultFolder;
-        Directory.CreateDirectory(folder);
-        return folder;
+        fallback ??= AppPaths.DefaultPicturesFolder;
+        var folder = string.IsNullOrEmpty(defaultFolder) ? fallback : defaultFolder;
+        try
+        {
+            Directory.CreateDirectory(folder);
+            return folder;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            Directory.CreateDirectory(fallback);
+            return fallback;
+        }
     }
 
     public static string? AskPath(Window? owner, AppSettings s)

@@ -50,7 +50,7 @@ public class ShellTests
     public void Strings_EveryPropertyResolves()
     {
         var properties = typeof(Strings).GetProperties().Where(p => p.PropertyType == typeof(string)).ToList();
-        Assert.Equal(58, properties.Count);
+        Assert.Equal(62, properties.Count);
         foreach (var p in properties)
             Assert.False(string.IsNullOrWhiteSpace((string?)p.GetValue(null)), p.Name);
     }

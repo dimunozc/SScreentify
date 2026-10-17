@@ -26,13 +26,19 @@ public sealed class OverlayController
     private bool _dragging;
     private bool _drawing;
 
-    public OverlayController(Func<AppSettings> settings, Action<AppSettings> saveSettings)
+    private readonly Func<bool, CaptureResult> _capture;
+    private readonly Func<IReadOnlyList<MonitorInfo>> _monitors;
+
+    public OverlayController(Func<AppSettings> settings, Action<AppSettings> saveSettings,
+        Func<bool, CaptureResult>? capture = null, Func<IReadOnlyList<MonitorInfo>>? monitors = null)
     {
+        _capture = capture ?? ScreenCapture.CaptureVirtualScreen;
+        _monitors = monitors ?? Monitors.Enumerate;
         _settings = settings;
         _saveSettings = saveSettings;
         Dispatcher = Dispatcher.CurrentDispatcher;
         // Raised on a system thread: marshal back to the UI thread.
-        SystemEvents.DisplaySettingsChanged += (_, _) => Dispatcher.BeginInvoke(Rebuild);
+        SystemEvents.DisplaySettingsChanged += (_, _) => Dispatcher.BeginInvoke(OnDisplaySettingsChanged);
         _chrome.Actions.CopyRequested += () => { if (Session is { } s) CopyRequested?.Invoke(s); };
         _chrome.Actions.SaveRequested += () => { if (Session is { } s) SaveRequested?.Invoke(s); };
         _chrome.Actions.PrintRequested += () => { if (Session is { } s) PrintRequested?.Invoke(s); };
@@ -50,11 +56,13 @@ public sealed class OverlayController
 
     public event Action<CaptureSession>? SessionOpened;
     public event Action? SessionClosed;
+    /// <summary>Opening a capture failed (for example the screen could not be read); the selector stays closed.</summary>
+    public event Action<Exception>? Failed;
     public event Action<CaptureSession>? CopyRequested, SaveRequested, PrintRequested;
 
     public void Prewarm()
     {
-        foreach (var monitor in Monitors.Enumerate())
+        foreach (var monitor in _monitors())
         {
             var window = new OverlayWindow(this, monitor);
             window.Prepare();
@@ -68,9 +76,9 @@ public sealed class OverlayController
         try
         {
             var settings = _settings();
-            var capture = ScreenCapture.CaptureVirtualScreen(settings.CaptureCursor);
+            var capture = _capture(settings.CaptureCursor);
             PerfTrace.Mark("captured", $"{capture.VirtualBounds.Width}x{capture.VirtualBounds.Height}");
-            if (!OverlayLayout.WindowRects(capture.Monitors).SequenceEqual(_windows.Select(w => w.Monitor.Bounds)))
+            if (!OverlayLayout.SameLayout(capture.Monitors, _windows.Select(w => w.Monitor).ToList()))
                 RebuildWindows();
 
             var session = new CaptureSession(capture, settings);
@@ -98,10 +106,10 @@ public sealed class OverlayController
             if (PerfTrace.Enabled) MarkFirstFrame();
             SessionOpened?.Invoke(session);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             Close();
-            throw;
+            Failed?.Invoke(ex);
         }
     }
 
@@ -110,25 +118,38 @@ public sealed class OverlayController
         var session = Session;
         Session = null;
         _creating = _dragging = _drawing = false;
-        _editor.Cancel();
-        _chrome.Detach();
-        foreach (var window in _windows)
+        try
         {
-            window.Hide();
-            window.Detach();
-        }
-        if (session is not null)
-        {
+            _editor.Cancel();
+            _chrome.Detach();
+            foreach (var window in _windows)
+            {
+                window.Hide();
+                window.Detach();
+            }
+            if (session is null) return;
+
             session.Selection.Changed -= OnSelectionChanged;
             session.ToolChanged -= OnToolChanged;
             session.Document.Changed -= RedrawAnnotations;
             _tools = null;
-            _saveSettings(session.ApplyTo(_settings()));
+            try
+            {
+                _saveSettings(session.ApplyTo(_settings()));
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Losing the remembered tool style is acceptable; losing the hotkey is not.
+                System.Diagnostics.Debug.WriteLine($"settings not saved: {ex.Message}");
+            }
             SessionClosed?.Invoke();
             // The capture lives mostly in native WIC/WPF memory that the GC does not feel; reclaim it once idle.
             Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, ReleaseCaptureMemory);
         }
-        _gate.Exit();
+        finally
+        {
+            _gate.Exit();
+        }
     }
 
     private void ReleaseCaptureMemory()
@@ -306,6 +327,13 @@ public sealed class OverlayController
 
     private OverlayWindow WindowAt(PointD p) =>
         _windows.FirstOrDefault(w => w.Monitor.Bounds.Contains(ToPixel(p))) ?? _windows[0];
+
+    /// <summary>Windows raises this several times per change; only a real layout change rebuilds (and closes an open capture).</summary>
+    internal void OnDisplaySettingsChanged()
+    {
+        if (OverlayLayout.SameLayout(_monitors(), _windows.Select(w => w.Monitor).ToList())) return;
+        Rebuild();
+    }
 
     private void Rebuild()
     {

@@ -62,4 +62,8 @@
   <data name="AboutText" xml:space="preserve"><value>Herramienta de capturas de pantalla sin conexión.</value></data>
   <data name="AboutVersion" xml:space="preserve"><value>Versión {0}</value></data>
   <data name="PaletteCustom" xml:space="preserve"><value>Personalizado…</value></data>
+  <data name="ToastCopyFailed" xml:space="preserve"><value>No se pudo copiar la captura al portapapeles.</value></data>
+  <data name="ToastPrintFailed" xml:space="preserve"><value>No se pudo imprimir: {0}</value></data>
+  <data name="ToastCaptureFailed" xml:space="preserve"><value>No se pudo capturar la pantalla: {0}</value></data>
+  <data name="ToastUnexpectedError" xml:space="preserve"><value>Algo salió mal: {0}. Los detalles están en error.log.</value></data>
 </root>

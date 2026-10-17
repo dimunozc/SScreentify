@@ -131,6 +131,7 @@ public class ToolControllerTests
     public void VKey_SwitchesToSelect()
     {
         var (session, tools) = Setup(ToolKind.Pen);
+        session.Selection.Set(new PixelRect(0, 0, 50, 50));
         Assert.True(tools.OnKey(Key.V, ModifierKeys.None));
         Assert.Equal(ToolKind.Select, session.Tool);
     }

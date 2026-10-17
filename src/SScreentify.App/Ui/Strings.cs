@@ -68,6 +68,10 @@ public static class Strings
     public static string AboutText => Get(nameof(AboutText));
     public static string AboutVersion => Get(nameof(AboutVersion));
     public static string PaletteCustom => Get(nameof(PaletteCustom));
+    public static string ToastCopyFailed => Get(nameof(ToastCopyFailed));
+    public static string ToastPrintFailed => Get(nameof(ToastPrintFailed));
+    public static string ToastCaptureFailed => Get(nameof(ToastCaptureFailed));
+    public static string ToastUnexpectedError => Get(nameof(ToastUnexpectedError));
 
     private static string Get(string key) =>
         Resources.GetString(key, Culture) ?? throw new MissingManifestResourceException(key);

@@ -25,6 +25,11 @@ public sealed class ToolController
             if (SelectedId is { } id && _session.Document.Items.All(a => a.Id != id)) SelectedId = null;
         };
         _session.ToolChanged += () => { SelectedId = null; Cancel(); };
+        // Drawing tools only make sense on a selection; without one the user must be able to select again.
+        _session.Selection.Changed += () =>
+        {
+            if (!_session.Selection.IsUsable && _session.Tool != ToolKind.None) _session.Tool = ToolKind.None;
+        };
     }
 
     /// <summary>The annotation being drawn; when it shares an Id with a document item it replaces it while dragging.</summary>
@@ -127,7 +132,7 @@ public sealed class ToolController
         var shift = m.HasFlag(ModifierKeys.Shift);
         switch (key)
         {
-            case Key.V when !ctrl:
+            case Key.V when !ctrl && _session.Selection.IsUsable:
                 _session.Tool = ToolKind.Select;
                 return true;
             case Key.Delete when SelectedId is { } id:

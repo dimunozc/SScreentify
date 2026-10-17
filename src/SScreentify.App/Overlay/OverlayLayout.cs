@@ -8,6 +8,9 @@ public static class OverlayLayout
     public static IReadOnlyList<PixelRect> WindowRects(IReadOnlyList<MonitorInfo> monitors) =>
         monitors.Select(m => m.Bounds).ToArray();
 
+    /// <summary>Same monitors with the same bounds, work areas, scales and primary flag (a scale-only change counts as different).</summary>
+    public static bool SameLayout(IReadOnlyList<MonitorInfo> a, IReadOnlyList<MonitorInfo> b) => a.SequenceEqual(b);
+
     /// <summary>The monitor that hosts the toolbars: contains the selection center, else overlaps it most, else the primary.</summary>
     public static MonitorInfo MonitorForSelection(IReadOnlyList<MonitorInfo> monitors, PixelRect sel)
     {

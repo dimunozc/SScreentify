@@ -32,6 +32,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        DispatcherUnhandledException += OnUnhandledException;
 
         var exportIcon = Array.IndexOf(e.Args, "--export-icon");
         if (exportIcon >= 0 && exportIcon + 1 < e.Args.Length)
@@ -60,6 +61,7 @@ public partial class App : Application
 
         _overlay = new OverlayController(() => Settings, SaveSettings);
         _overlay.Prewarm();
+        _overlay.Failed += ex => _toasts.Show(string.Format(Strings.ToastCaptureFailed, ex.Message), isError: true);
         _export = new ExportActions(_overlay, () => Settings, SaveSettings, _toasts);
 
         _hotkeys = new HotkeyService();
@@ -172,6 +174,23 @@ public partial class App : Application
     }
 
     private void StartCapture() => _overlay?.Open();
+
+    /// <summary>Last line of defence: a tray app must not vanish. Log, tell the user, keep running.</summary>
+    private void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        try
+        {
+            var log = Path.Combine(Path.GetDirectoryName(AppPaths.SettingsFile)!, "error.log");
+            Directory.CreateDirectory(Path.GetDirectoryName(log)!);
+            File.AppendAllText(log, $"{DateTime.Now:O} {e.Exception}{Environment.NewLine}");
+            _toasts.Show(string.Format(Strings.ToastUnexpectedError, e.Exception.Message), isError: true);
+        }
+        catch (Exception)
+        {
+            // Reporting must never throw from the handler.
+        }
+        e.Handled = true;
+    }
 
     private static void ScheduleMemorySample(string name)
     {

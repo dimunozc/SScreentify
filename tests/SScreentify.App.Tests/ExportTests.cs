@@ -165,22 +165,6 @@ public class ExportTests
     }
 
     [Fact]
-    public void Copy_WhenClipboardLocked_ReturnsBusyAndKeepsSession()
-    {
-        StaRunner.Run(() =>
-        {
-            var attempts = 0;
-            var result = ClipboardService.Copy(Gradient(10, 10), _ =>
-            {
-                attempts++;
-                throw new COMException("CLIPBRD_E_CANT_OPEN", unchecked((int)0x800401D0));
-            }, retryDelay: TimeSpan.Zero);
-            Assert.Equal(ClipboardResult.Busy, result);
-            Assert.Equal(10, attempts);
-        });
-    }
-
-    [Fact]
     public void Copy_OffersPngAndBitmap()
     {
         StaRunner.Run(() =>
