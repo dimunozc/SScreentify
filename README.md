@@ -49,3 +49,7 @@ Decisiones tomadas a partir de estas mediciones:
 - Al cerrar el selector se sueltan las referencias a la captura y se fuerza una recolección de memoria cuando la app queda inactiva.
 
 No se ha medido: varios monitores, escalas distintas del 100 % ni monitores 4K. Con renderizado por software, la fluidez al arrastrar la selección en un 4K está por comprobar.
+
+## Continuar el desarrollo
+
+Estado, mapa del código, pendientes y trampas conocidas: [docs/CONTINUAR.md](docs/CONTINUAR.md).
