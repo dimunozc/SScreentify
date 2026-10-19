@@ -82,6 +82,18 @@ Todos los de la revisión final están resueltos salvo uno, que se dejó así a 
 - **Revisión visual sin abrir la app:** `VisualSnapshotTests` renderiza el selector, Opciones y los avisos sobre un escritorio sintético. Con `SSCREENTIFY_SNAPSHOT_DIR=<carpeta>` guarda los PNG.
 - **Instalar software con Claude:** el modo automático bloquea `winget`, así que hay que ejecutarlo con `!` en el prompt, añadiendo `--source winget --accept-source-agreements --accept-package-agreements`.
 
+## Publicar una versión
+
+1. Sube `<Version>` en `src/SScreentify.App/SScreentify.App.csproj` (por ejemplo `1.0.1`).
+2. `dotnet test`.
+3. `.\scripts\build-installer.ps1`. Publica la app en `publish\` y deja `dist\SScreentify-Setup-<versión>.exe`. Necesita Inno Setup 6 (`winget install --id JRSoftware.InnoSetup -e --source winget`). El script del instalador es `installer/SScreentify.iss`.
+4. Commit, `git tag v<versión>` y `git push --follow-tags`.
+5. En GitHub: **Releases › Draft a new release**, elige la etiqueta y adjunta el `.exe` de `dist\`. El README enlaza a `releases/latest`, así que el enlace de descarga funciona solo.
+
+Datos del instalador: instala por usuario sin pedir administrador (`%LOCALAPPDATA%\Programs\SScreentify`) y crea un acceso directo en el menú Inicio. Si la app está abierta, la cierra antes de actualizar. Al desinstalar quita la entrada de «Iniciar con Windows» y conserva los ajustes. **No cambies nunca su `AppId`**: Windows lo usa para reconocer las actualizaciones.
+
+El README de GitHub está en inglés (`README.md`) y en español (`README.es.md`). Si cambias algo, cambia los dos. El logo con el nombre (`docs/assets/logo-*.svg`) tiene las letras de Space Grotesk 600 convertidas en trazados, con la misma composición que el lienzo de Claude Design. La imagen `docs/assets/editor.png` sale de `VisualSnapshotTests` con `SSCREENTIFY_SNAPSHOT_DIR`.
+
 ## Medir el rendimiento
 
 Arranca `publish\SScreentify.exe --perf`, haz unas capturas y cierra. El registro queda en `%APPDATA%\SScreentify\perf.log`:
@@ -91,7 +103,13 @@ Arranca `publish\SScreentify.exe --perf`, haz unas capturas y cierra. El registr
 - `tray-ready`: arranque en frío.
 - `idle-memory`: memoria 10 s después de cerrar una captura.
 
-La tabla de referencia está en el README (mediana 30,6 ms, 54,7 MB en reposo).
+La tabla de referencia está en el README (mediana 30,6 ms, 54,7 MB en reposo, medido el 17-10-2026 con un monitor de 1920×1080 y Impr Pant y Esc simulados con `keybd_event`).
+
+Decisiones tomadas a partir de esas mediciones:
+
+- **Sin ReadyToRun** (`publish.ps1 -ReadyToRun` existe para comparar): no arrancaba más rápido (446 ms frente a 480 ms) y usaba 75 MB en reposo.
+- **Renderizado por software:** ver «Trampas». Con la GPU, la memoria privada en reposo se quedaba en 114–120 MB, con el mismo tiempo de apertura.
+- Al cerrar el selector se sueltan las referencias a la captura y se fuerza una recolección de memoria cuando la app queda inactiva.
 
 ## Ideas para siguientes versiones
 
@@ -101,4 +119,6 @@ Ninguna está aprobada; son puntos de partida para una conversación:
 - Resolver los pendientes menores de arriba.
 - Reducir el tamaño del `.exe` (178 MB), por ejemplo con compresión del ejecutable o un instalador, midiendo el arranque.
 - Más idiomas: hay que añadir `Strings.<idioma>.resx`, un valor a `Language` y `LanguagePreference`, y nombres de teclas en `HotkeyRules`.
-- Funciones que el diseño dejó fuera: OCR o grabación (ver «Lo que no es» en el diseño). La captura con desplazamiento se está diseñando (19-10-2026).
+- Funciones que el diseño dejó fuera: OCR o grabación (ver «Lo que no es» en el diseño).
+- Captura con desplazamiento: Diego la pidió y después la aplazó (19-10-2026). No hay diseño; hay que empezar preguntando qué quiere capturar (web, chat, documento…).
+- Firmar el instalador y el `.exe` para que Windows SmartScreen no avise. Exige un certificado de firma de código.

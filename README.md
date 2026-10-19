@@ -1,58 +1,126 @@
-# SScreentify
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo-light.svg" alt="SScreentify" width="420">
+  </picture>
+</p>
 
-Herramienta de capturas de pantalla para Windows. Vive en la bandeja del sistema: pulsas **Impr Pant**, eliges una zona, la anotas y la **copias** (Ctrl+C) para pegarla en un chat o la **guardas** (Ctrl+S) donde quieras.
+<p align="center">
+  <b>Press Print Screen, pick an area, mark it up, paste it anywhere.</b><br>
+  A fast, offline screenshot tool for Windows.
+</p>
 
-Funciona sin conexión: no hace ninguna petición de red.
+<p align="center">
+  <a href="../../releases/latest">Download</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#keyboard-shortcuts">Shortcuts</a> ·
+  <a href="#build-from-source">Build</a> ·
+  <a href="README.es.md">Español</a>
+</p>
 
-## Funciones
+<p align="center">
+  <img src="docs/assets/editor.png" alt="The SScreentify selector with a rectangle, an arrow, text and a highlight drawn over a selection, and its tools and actions bars" width="640"><br>
+  <sub>The selector and its toolbars, rendered from the app's own UI code over a synthetic desktop.</sub>
+</p>
 
-- **Selector** en todos los monitores, con soporte de DPI por monitor. La zona se ajusta con tiradores o con las flechas (Mayús + flechas cambia el tamaño). Ctrl+A selecciona el monitor y, si lo pulsas otra vez, todo el escritorio. Esc o clic derecho fuera de la zona lo cancelan.
-- **Editor:** selección (V), lápiz, línea, flecha, rectángulo, círculo, resaltador, texto y color. La rueda del ratón cambia el grosor o el tamaño de letra. Mayús fija ángulos de 45° y cuadrados o círculos perfectos. Deshacer con Ctrl+Z y rehacer con Ctrl+Y o Ctrl+Mayús+Z.
-- **Censurar:** pixelado, desenfoque o bloque sólido. Se calcula desde los píxeles originales y queda incrustado en la imagen final. Para datos sensibles usa el bloque sólido.
-- **Acciones:** copiar (PNG + mapa de bits), guardar (PNG, JPG o BMP, sin metadatos) e imprimir. Atajo opcional para guardar la pantalla completa al instante.
-- **Idiomas:** español e inglés. Por defecto usa el idioma de Windows (español si Windows está en español, inglés en cualquier otro caso); se puede cambiar en Opciones.
-- **Opciones:** avisos, incluir el cursor, recordar la última selección, iniciar con Windows, idioma, atajos, formato, calidad JPG y carpeta por defecto. La configuración se guarda en `%APPDATA%\SScreentify\settings.json`.
+## What it is for
 
-## Impr Pant en Windows 11
+SScreentify lives in the notification area. When you press **Print Screen**, the whole screen freezes under a dark veil. You drag a rectangle, draw on it if you want (arrows, boxes, text, a highlighter, censor blocks), and then **copy** it (Ctrl+C) to paste into a chat, email or document, or **save** it (Ctrl+S) as a file.
 
-Windows 11 puede reservar la tecla Impr Pant para la herramienta Recortes. No hace falta cambiar nada: mientras SScreentify está abierto, lee los atajos que usan Impr Pant directamente del teclado, abre su selector y no deja que la pulsación llegue a Recortes. No modifica ninguna opción de Windows; al cerrar SScreentify, Impr Pant vuelve a comportarse como antes.
+It is built for the everyday "show someone what I mean" screenshot: open instantly, annotate fast and get out of the way. It never touches the network.
 
-Limitación conocida (comprobada el 19-10-2026): si la ventana activa se ejecuta como administrador, Windows no deja que SScreentify lea el teclado y la tecla abre Recortes. En ese caso, haz clic en el icono de la bandeja.
+## Features
 
-## Compilar, probar y publicar
+- **Instant selector** on every monitor, with per-monitor DPI support. It opens in about 30 ms.
+- **Precise selection:** 8 handles, arrow keys to move it and Shift + arrow keys to resize it. The size label shows physical pixels. Ctrl+A selects the monitor under the cursor; press it again for the whole desktop.
+- **Editor:** pen, line, arrow, rectangle, circle, highlighter, text and color, with undo and redo. The mouse wheel changes the stroke width or font size, and Shift snaps to 45° angles and perfect squares and circles. Every annotation stays editable: select it with V to move, resize or delete it.
+- **Censor:** pixelate, blur or a solid block, always computed from the original pixels and burned into the exported image. Use the solid block for sensitive data, because pixelation and blur can be partly reversed.
+- **Copy:** puts the image on the clipboard as PNG and as a standard bitmap, so it pastes into both modern and older apps.
+- **Save:** PNG, JPG (adjustable quality) or BMP, with no metadata. Files are named by date and time, and an instant save never replaces an earlier one.
+- **Print** straight from the selector.
+- **Save the full screen instantly** with an optional second shortcut (off by default).
+- **Takes Print Screen from the Windows Snipping Tool** while SScreentify is running, without changing any Windows setting.
+- **English and Spanish.** It follows the Windows display language by default, and you can change it in Options.
+- **Options:** notices, include the cursor, remember the last selection, start with Windows, language, shortcuts, default format, JPG quality and default folder.
+- **Light on resources:** about 55 MB of memory while idle.
 
-Requisitos: Windows 10 1903 o posterior y el SDK de .NET 8.
+## Download and install
+
+1. Download `SScreentify-Setup-<version>.exe` from the [latest release](../../releases/latest).
+2. Run it. It installs for your user only (under `%LOCALAPPDATA%\Programs\SScreentify`), so it does not need administrator rights.
+3. SScreentify starts in the notification area. Press **Print Screen** to capture, or left-click the tray icon.
+
+Requirements: Windows 10 version 1903 or later, 64-bit. The installer includes everything it needs, so you do not have to install .NET.
+
+> **Windows SmartScreen:** the installer is not code-signed yet, so Windows may show "Windows protected your PC". Choose **More info › Run anyway** if you trust the download.
+
+To uninstall, use **Settings › Apps › Installed apps › SScreentify**. Your settings (`%APPDATA%\SScreentify`) and your saved screenshots are kept.
+
+## Keyboard shortcuts
+
+| Where | Shortcut | Action |
+|---|---|---|
+| Anywhere | Print Screen | Open the selector (configurable) |
+| Anywhere | *(optional)* | Save the full screen instantly |
+| Selector | Ctrl+C | Copy and close |
+| Selector | Ctrl+S | Save as… |
+| Selector | Ctrl+P | Print |
+| Selector | Esc, Ctrl+X or right-click outside | Close without saving |
+| Selector | Ctrl+A | Select the monitor; press again for the whole desktop |
+| Selector | Arrow keys / Shift + arrow keys | Move / resize the selection |
+| Editor | Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z | Undo, redo |
+| Editor | V | Select annotations; Delete removes the selected one |
+| Editor | Mouse wheel | Stroke width or font size |
+| Editor | Shift while drawing | 45° angles, squares and circles |
+
+### Print Screen on Windows 11
+
+Windows 11 can reserve Print Screen for the Snipping Tool. While SScreentify is running it reads the key directly from the keyboard, so Print Screen opens SScreentify instead; when you exit it, the key goes back to the Snipping Tool. No Windows setting is changed.
+
+**Known limitation:** while a window running as administrator is in the foreground, Windows does not let a normal app read the keyboard, so Print Screen opens the Snipping Tool there. Left-click the tray icon instead.
+
+## Privacy
+
+SScreentify makes no network requests and has no telemetry or accounts. Screenshots only go where you copy or save them. Settings are a small JSON file at `%APPDATA%\SScreentify\settings.json`.
+
+## Build from source
+
+You need Windows and the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 
 ```powershell
-dotnet test                       # pruebas de Core y de la App
-dotnet run --project src\SScreentify.App
-.\scripts\publish.ps1             # crea publish\SScreentify.exe (un solo archivo, autocontenido)
+dotnet test                                # unit and UI tests
+dotnet run --project src\SScreentify.App   # run from source
+.\scripts\publish.ps1                      # self-contained single-file publish\SScreentify.exe
+.\scripts\build-installer.ps1              # dist\SScreentify-Setup-<version>.exe (needs Inno Setup 6)
 ```
 
-Argumentos útiles:
+To install Inno Setup: `winget install --id JRSoftware.InnoSetup -e --source winget`. The version comes from `<Version>` in `src/SScreentify.App/SScreentify.App.csproj`.
 
-- `--perf`: escribe tiempos y memoria en `%APPDATA%\SScreentify\perf.log`.
-- `--gpu-render`: usa la GPU en lugar del renderizado por software (ver «Rendimiento»).
+Useful switches: `--perf` writes timings and memory to `%APPDATA%\SScreentify\perf.log`, and `--gpu-render` uses GPU rendering instead of the default software rendering.
 
-## Rendimiento
+### How it is built
 
-Medido el 17-10-2026 en el equipo de Diego, con un monitor de 1920×1080 píxeles físicos. Se usó el ejecutable publicado (`scripts\publish.ps1`, un solo archivo, sin ReadyToRun) con `--perf`, y las pulsaciones de Impr Pant y Esc se simularon con `keybd_event`.
+- **C# and WPF on .NET 8.** `SScreentify.Core` holds the pure logic: geometry, annotations, censoring, settings and shortcuts. `SScreentify.App` holds the Windows parts: capture, overlay, rendering, export and UI.
+- **Capture:** GDI captures the whole virtual desktop in physical pixels, and each monitor gets its own overlay window that converts to its DPI only when drawing.
+- **Rendering:** software rendering is the default, because GPU rendering kept about 70 MB of driver memory alive after the first capture.
 
-| Medida | Resultado | Objetivo |
-|---|---|---|
-| Pulsación → selector visible, en caliente (20 capturas) | mediana 30,6 ms · p95 33,6 ms | ≤ 150 ms |
-| De ello, la captura de la pantalla | mediana 22,5 ms | — |
-| Arranque en frío hasta la bandeja (3 arranques) | 488 · 480 · 489 ms | — |
-| Memoria en reposo tras capturar (privada) | 54,7 MB (conjunto de trabajo 130 MB) | ≤ 60 MB |
+Developer notes (in Spanish), with the code map and known pitfalls, are in [docs/CONTINUAR.md](docs/CONTINUAR.md).
 
-Decisiones tomadas a partir de estas mediciones:
+### Performance
 
-- **Renderizado por software por defecto.** Con la GPU, el driver retiene unos 70 MB después de la primera captura: la memoria privada en reposo se quedaba en 114–120 MB, con el mismo tiempo de apertura (~30 ms). Con renderizado por software se queda en unos 45 MB (build dependiente del framework) o 55 MB (build publicado). `--gpu-render` vuelve a usar la GPU.
-- **Sin ReadyToRun.** El build con ReadyToRun no arrancaba más rápido en caliente (446 ms frente a 480 ms) y usaba 75 MB en reposo.
-- Al cerrar el selector se sueltan las referencias a la captura y se fuerza una recolección de memoria cuando la app queda inactiva.
+Measured on one 1920×1080 monitor with the published build:
 
-No se ha medido: varios monitores, escalas distintas del 100 % ni monitores 4K. Con renderizado por software, la fluidez al arrastrar la selección en un 4K está por comprobar.
+| Measure | Result |
+|---|---|
+| Key press → selector visible (warm, 20 runs) | median 30.6 ms, p95 33.6 ms |
+| Cold start to tray | ~0.5 s |
+| Idle memory after a capture (private) | 54.7 MB |
+| Censor blur while dragging, 600×400 area | 8–10 ms per update |
 
-## Continuar el desarrollo
+Not yet measured: several monitors, mixed scaling and 4K.
 
-Estado, mapa del código, pendientes y trampas conocidas: [docs/CONTINUAR.md](docs/CONTINUAR.md).
+## License
+
+[MIT](LICENSE) © 2026 Diego Muñoz.
+
+The logo and name are SScreentify's own; the wordmark uses [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) (SIL Open Font License), converted to outlines.
