@@ -108,7 +108,7 @@ public class FinalReviewTests
     [Fact]
     public void SaveFullscreenInstant_TwiceInARowKeepsBothFiles()
     {
-        var folder = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var folder = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
         try
         {
             StaRunner.Run(() =>
@@ -168,7 +168,7 @@ public class FinalReviewTests
     [Fact]
     public void ResolveInitialFolder_UncreatableDefaultFallsBack()
     {
-        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         try
         {

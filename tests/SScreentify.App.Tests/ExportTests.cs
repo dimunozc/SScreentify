@@ -181,7 +181,7 @@ public class ExportTests
     [Fact]
     public void ResolveInitialFolder_FallsBackWhenMissing()
     {
-        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
         try
         {
             var fallback = Path.Combine(root, "Capturas");
@@ -198,7 +198,7 @@ public class ExportTests
     [Fact]
     public void ResolveInitialFolder_SkipsFoldersWithoutWritePermission()
     {
-        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
         var locked = new DirectoryInfo(Path.Combine(root, "solo-lectura"));
         var deny = new FileSystemAccessRule(WindowsIdentity.GetCurrent().User!, FileSystemRights.CreateFiles, AccessControlType.Deny);
         try
@@ -228,7 +228,7 @@ public class ExportTests
     [Fact]
     public void Write_WhenReplaceFails_LeavesNoTempFile()
     {
-        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
         try
         {
             // A folder where the image should go makes the final move fail after the temporary file is written.

@@ -11,7 +11,7 @@ public static class SaveService
     private static readonly ImageFormat[] FilterOrder = { ImageFormat.Png, ImageFormat.Jpeg, ImageFormat.Bmp };
 
     /// <summary>The last folder if it still exists and accepts new files; otherwise the default folder (created if needed);
-    /// if that cannot be created or written (unplugged drive, no permission), the fallback (Pictures\sScreentify).</summary>
+    /// if that cannot be created or written (unplugged drive, no permission), the fallback (Pictures\SScreentify).</summary>
     public static string ResolveInitialFolder(string? lastFolder, string? defaultFolder, string? fallback = null)
     {
         if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder) && AcceptsNewFiles(lastFolder)) return lastFolder;
@@ -35,7 +35,7 @@ public static class SaveService
     {
         try
         {
-            using var probe = new FileStream(Path.Combine(folder, $".sScreentify-{Guid.NewGuid():N}.tmp"), FileMode.CreateNew,
+            using var probe = new FileStream(Path.Combine(folder, $".SScreentify-{Guid.NewGuid():N}.tmp"), FileMode.CreateNew,
                 FileAccess.Write, FileShare.None, bufferSize: 1, FileOptions.DeleteOnClose);
             return true;
         }

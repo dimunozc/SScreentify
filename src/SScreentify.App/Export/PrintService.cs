@@ -25,7 +25,7 @@ public static class PrintService
         };
         page.Measure(new Size(areaW, areaH));
         page.Arrange(new Rect(0, 0, page.Width, page.Height));
-        dialog.PrintVisual(page, "sScreentify");
+        dialog.PrintVisual(page, "SScreentify");
         return true;
     }
 }

@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:SScreentify.App.Overlay"
         WindowStyle="None" ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False"
         WindowStartupLocation="Manual" Background="Black" UseLayoutRounding="True"
-        Title="sScreentify" Cursor="Cross" Focusable="True">
+        Title="SScreentify" Cursor="Cross" Focusable="True">
     <Grid x:Name="Root" ClipToBounds="True">
         <Canvas x:Name="ImageHost">
             <Image x:Name="CaptureImage" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />

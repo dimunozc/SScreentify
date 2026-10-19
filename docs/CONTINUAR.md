@@ -1,4 +1,4 @@
-# Cómo continuar con sScreentify
+# Cómo continuar con SScreentify
 
 Notas para retomar el proyecto otro día, con Claude o sin él. El README explica qué hace la app; este documento explica **dónde está cada cosa, qué falta y qué trampas hay**.
 
@@ -17,12 +17,12 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 cd C:\Users\Diego\Documents\Repositorios\sScreentify
 dotnet test                                   # tienen que pasar las 148
 dotnet run --project src\SScreentify.App      # la app queda en la bandeja; Impr Pant para capturar
-.\scripts\publish.ps1                         # genera publish\sScreentify.exe
+.\scripts\publish.ps1                         # genera publish\SScreentify.exe
 ```
 
 Si `dotnet` no se encuentra, el SDK está en `C:\Program Files\dotnet\dotnet.exe`. En la terminal de Claude a veces no está en el PATH: `export PATH="/c/Program Files/dotnet:$PATH"`.
 
-Antes de probar, cierra cualquier sScreentify que tengas abierto (icono de la bandeja → Salir). Solo puede haber una instancia, y una segunda se cierra sin avisar.
+Antes de probar, cierra cualquier SScreentify que tengas abierto (icono de la bandeja → Salir). Solo puede haber una instancia, y una segunda se cierra sin avisar.
 
 ## Pruebas a mano
 
@@ -65,7 +65,7 @@ Todos los de la revisión final están resueltos salvo uno, que se dejó así a 
 | `Export/` | `Flattener` (imagen final), `ImageEncoder`, `ClipboardService`, `SaveService`, `PrintService` y `ExportActions`, que los orquesta y muestra los avisos |
 | `Ui/` | Tema Cristal oscuro (`Theme.xaml` y `Palette.cs`), barras, paleta, iconos, Opciones, avisos, Acerca de y textos (`Strings.resx` y `Strings.cs`) |
 | `Services/` | Atajos globales (`HotkeyService`, y `KeyboardHook` para Impr Pant), bandeja, avisos, inicio con Windows y rutas |
-| `Diagnostics/` | `--perf` (tiempos y memoria) y `--export-icon` (generó `Assets/app.ico`) |
+| `Diagnostics/` | `--perf` (tiempos y memoria) y `--export-icon` (genera `Assets/app.ico` a partir de `Ui/BrandMark.cs`; si cambias el logo, regenéralo con `SScreentify.exe --export-icon src\SScreentify.App\Assets\app.ico`) |
 
 **Regla clave de diseño:** toda la geometría va en **píxeles físicos del escritorio virtual**. Cada ventana convierte a DIP con su propio DPI solo al dibujar (`OverlayWindow.PhysicalToDip` y `ToPhysical`). Las anotaciones se guardan en coordenadas de la captura, no de la selección.
 
@@ -75,7 +75,7 @@ Todos los de la revisión final están resueltos salvo uno, que se dejó así a 
 - **Renderizado por software por defecto** (`App.xaml.cs`): con la GPU, el driver retenía unos 70 MB y no se cumplía el objetivo de 60 MB en reposo. `--gpu-render` vuelve a la GPU. Si cambias esto, vuelve a medir.
 - **Impr Pant en Windows 11:** los atajos con Impr Pant no usan `RegisterHotKey` (Recortes puede tenerla reservada), sino un gancho de teclado de bajo nivel (`Services/KeyboardHook.cs`) en un hilo propio, que se queda con la pulsación. Windows quita sin avisar un gancho que tarda en responder, así que su función no debe esperar nunca al hilo de la interfaz: solo consulta `KeyInterceptor` y encola el atajo con `BeginInvoke`. Con una ventana de administrador en primer plano no recibe teclas (protección de Windows, comprobado el 19-10-2026) y Recortes gana. Se descartó a propósito: arreglarlo exigía ejecutar la app como administrador, firmarla con `uiAccess`, o desactivar la opción de Recortes y registrar también la tecla con `RegisterHotKey`. En este equipo, `RegisterHotKey` acepta Impr Pant aunque Recortes la tenga, pero Recortes gana igualmente.
 - **Desenfoque de Censurar** (`Imaging/Censor.cs`, `Blur`): se recalcula en cada movimiento del ratón, así que tiene que ser rápido. Son tres desenfoques de caja por eje con sumas acumuladas, que dan casi el mismo resultado que el gaussiano (diferencia máxima de 10/255 en bordes duros, comprobada contra una referencia en `CensorTests`). Los métodos llevan `AggressiveOptimization` para que el primer arrastre no vaya con el código sin optimizar. Medido el 19-10-2026 (Release, mediana): 600×400 en 8–10 ms (antes 44–54), 1200×700 en 26–37 ms (antes 150), pantalla completa 1920×1080 en 82 ms (antes 377) y 4K en 256 ms (antes 1430).
-- **Carpeta de guardado** (`Export/SaveService.cs`, `ResolveInitialFolder`): para saber si se puede escribir en una carpeta, crea un archivo vacío `.sScreentify-….tmp` que Windows borra al cerrarlo. Predecir los permisos es poco fiable.
+- **Carpeta de guardado** (`Export/SaveService.cs`, `ResolveInitialFolder`): para saber si se puede escribir en una carpeta, crea un archivo vacío `.SScreentify-….tmp` que Windows borra al cerrarlo. Predecir los permisos es poco fiable.
 - **Recursos de WPF compartidos entre hilos** (pinceles y geometrías `static`): tienen que estar congelados (`Freeze()`). Si no, las pruebas fallan con «el propietario es otro subproceso».
 - **Pruebas con WPF:** usa `StaRunner.Run(...)`. `OverlayController` y `ExportActions` aceptan proveedores falsos de captura y monitores, e `IToastSink`, para probar sin abrir ventanas (ver `FinalReviewTests`).
 - **Revisión visual sin abrir la app:** `VisualSnapshotTests` renderiza el selector, Opciones y los avisos sobre un escritorio sintético. Con `SSCREENTIFY_SNAPSHOT_DIR=<carpeta>` guarda los PNG.
@@ -83,7 +83,7 @@ Todos los de la revisión final están resueltos salvo uno, que se dejó así a 
 
 ## Medir el rendimiento
 
-Arranca `publish\sScreentify.exe --perf`, haz unas capturas y cierra. El registro queda en `%APPDATA%\sScreentify\perf.log`:
+Arranca `publish\SScreentify.exe --perf`, haz unas capturas y cierra. El registro queda en `%APPDATA%\SScreentify\perf.log`:
 
 - `hotkey` → `rendered`: tiempo hasta ver el selector.
 - `captured`: tiempo de captura.

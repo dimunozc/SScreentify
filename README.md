@@ -1,4 +1,4 @@
-# sScreentify
+# SScreentify
 
 Herramienta de capturas de pantalla para Windows. Vive en la bandeja del sistema: pulsas **Impr Pant**, eliges una zona, la anotas y la **copias** (Ctrl+C) para pegarla en un chat o la **guardas** (Ctrl+S) donde quieras.
 
@@ -10,13 +10,13 @@ Funciona sin conexión: no hace ninguna petición de red.
 - **Editor:** selección (V), lápiz, línea, flecha, rectángulo, círculo, resaltador, texto y color. La rueda del ratón cambia el grosor o el tamaño de letra. Mayús fija ángulos de 45° y cuadrados o círculos perfectos. Deshacer con Ctrl+Z y rehacer con Ctrl+Y o Ctrl+Mayús+Z.
 - **Censurar:** pixelado, desenfoque o bloque sólido. Se calcula desde los píxeles originales y queda incrustado en la imagen final. Para datos sensibles usa el bloque sólido.
 - **Acciones:** copiar (PNG + mapa de bits), guardar (PNG, JPG o BMP, sin metadatos) e imprimir. Atajo opcional para guardar la pantalla completa al instante.
-- **Opciones:** avisos, incluir el cursor, recordar la última selección, iniciar con Windows, atajos, formato, calidad JPG y carpeta por defecto. La configuración se guarda en `%APPDATA%\sScreentify\settings.json`.
+- **Opciones:** avisos, incluir el cursor, recordar la última selección, iniciar con Windows, atajos, formato, calidad JPG y carpeta por defecto. La configuración se guarda en `%APPDATA%\SScreentify\settings.json`.
 
 ## Impr Pant en Windows 11
 
-Windows 11 puede reservar la tecla Impr Pant para la herramienta Recortes. No hace falta cambiar nada: mientras sScreentify está abierto, lee los atajos que usan Impr Pant directamente del teclado, abre su selector y no deja que la pulsación llegue a Recortes. No modifica ninguna opción de Windows; al cerrar sScreentify, Impr Pant vuelve a comportarse como antes.
+Windows 11 puede reservar la tecla Impr Pant para la herramienta Recortes. No hace falta cambiar nada: mientras SScreentify está abierto, lee los atajos que usan Impr Pant directamente del teclado, abre su selector y no deja que la pulsación llegue a Recortes. No modifica ninguna opción de Windows; al cerrar SScreentify, Impr Pant vuelve a comportarse como antes.
 
-Limitación conocida (comprobada el 19-10-2026): si la ventana activa se ejecuta como administrador, Windows no deja que sScreentify lea el teclado y la tecla abre Recortes. En ese caso, haz clic en el icono de la bandeja.
+Limitación conocida (comprobada el 19-10-2026): si la ventana activa se ejecuta como administrador, Windows no deja que SScreentify lea el teclado y la tecla abre Recortes. En ese caso, haz clic en el icono de la bandeja.
 
 ## Compilar, probar y publicar
 
@@ -25,12 +25,12 @@ Requisitos: Windows 10 1903 o posterior y el SDK de .NET 8.
 ```powershell
 dotnet test                       # pruebas de Core y de la App
 dotnet run --project src\SScreentify.App
-.\scripts\publish.ps1             # crea publish\sScreentify.exe (un solo archivo, autocontenido)
+.\scripts\publish.ps1             # crea publish\SScreentify.exe (un solo archivo, autocontenido)
 ```
 
 Argumentos útiles:
 
-- `--perf`: escribe tiempos y memoria en `%APPDATA%\sScreentify\perf.log`.
+- `--perf`: escribe tiempos y memoria en `%APPDATA%\SScreentify\perf.log`.
 - `--gpu-render`: usa la GPU en lugar del renderizado por software (ver «Rendimiento»).
 
 ## Rendimiento

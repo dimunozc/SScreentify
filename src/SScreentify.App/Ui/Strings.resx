@@ -37,7 +37,7 @@
   <data name="CensorPixelate" xml:space="preserve"><value>Pixelado</value></data>
   <data name="CensorBlur" xml:space="preserve"><value>Desenfoque</value></data>
   <data name="CensorSolid" xml:space="preserve"><value>Bloque sólido</value></data>
-  <data name="OptionsTitle" xml:space="preserve"><value>Opciones de sScreentify</value></data>
+  <data name="OptionsTitle" xml:space="preserve"><value>Opciones de SScreentify</value></data>
   <data name="TabGeneral" xml:space="preserve"><value>General</value></data>
   <data name="TabHotkeys" xml:space="preserve"><value>Atajos</value></data>
   <data name="TabFormats" xml:space="preserve"><value>Formatos</value></data>
@@ -56,7 +56,7 @@
   <data name="ButtonBrowse" xml:space="preserve"><value>Examinar…</value></data>
   <data name="ButtonOk" xml:space="preserve"><value>Aceptar</value></data>
   <data name="ButtonCancel" xml:space="preserve"><value>Cancelar</value></data>
-  <data name="AboutTitle" xml:space="preserve"><value>Acerca de sScreentify</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Acerca de SScreentify</value></data>
   <data name="AboutText" xml:space="preserve"><value>Herramienta de capturas de pantalla sin conexión.</value></data>
   <data name="AboutVersion" xml:space="preserve"><value>Versión {0}</value></data>
   <data name="PaletteCustom" xml:space="preserve"><value>Personalizado…</value></data>

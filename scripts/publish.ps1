@@ -1,4 +1,4 @@
-# Builds the single-file, self-contained sScreentify.exe into .\publish (or -Output).
+# Builds the single-file, self-contained SScreentify.exe into .\publish (or -Output).
 param(
     [string]$Output = "publish",
     [switch]$ReadyToRun
@@ -15,4 +15,4 @@ $publishArgs = @(
 )
 & dotnet @publishArgs
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed ($LASTEXITCODE)" }
-Get-Item (Join-Path $root "$Output\sScreentify.exe") | Select-Object FullName, @{ n = "MB"; e = { [math]::Round($_.Length / 1MB, 1) } }
+Get-Item (Join-Path $root "$Output\SScreentify.exe") | Select-Object FullName, @{ n = "MB"; e = { [math]::Round($_.Length / 1MB, 1) } }

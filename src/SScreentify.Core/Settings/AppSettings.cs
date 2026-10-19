@@ -16,7 +16,7 @@ public sealed record AppSettings
     public HotkeySetting SaveFullscreenHotkey { get; init; } = new(false, HotkeyModifiers.Shift, HotkeyRules.VkSnapshot);
     public ImageFormat Format { get; init; } = ImageFormat.Png;
     public int JpegQuality { get; init; } = 90;
-    /// <summary>null means Pictures\sScreentify.</summary>
+    /// <summary>null means Pictures\SScreentify.</summary>
     public string? DefaultFolder { get; init; }
     public string? LastSaveFolder { get; init; }
     public string Color { get; init; } = "#F43F5E";

@@ -11,25 +11,25 @@ public class AutoStartTests
     [Fact]
     public void AutoStart_ApplyTrueThenFalse()
     {
-        const string keyPath = @"Software\sScreentify.Tests\Run";
+        const string keyPath = @"Software\SScreentify.Tests\Run";
         try
         {
             using var run = Registry.CurrentUser.CreateSubKey(keyPath);
             var autoStart = new AutoStart(run);
 
-            autoStart.Apply(true, @"C:\Apps\sScreentify.exe");
-            Assert.Equal("\"C:\\Apps\\sScreentify.exe\"", run.GetValue("sScreentify"));
+            autoStart.Apply(true, @"C:\Apps\SScreentify.exe");
+            Assert.Equal("\"C:\\Apps\\SScreentify.exe\"", run.GetValue("SScreentify"));
             Assert.True(autoStart.IsEnabled());
 
-            autoStart.Apply(false, @"C:\Apps\sScreentify.exe");
-            Assert.Null(run.GetValue("sScreentify"));
+            autoStart.Apply(false, @"C:\Apps\SScreentify.exe");
+            Assert.Null(run.GetValue("SScreentify"));
             Assert.False(autoStart.IsEnabled());
 
-            autoStart.Apply(false, @"C:\Apps\sScreentify.exe"); // already absent: no error
+            autoStart.Apply(false, @"C:\Apps\SScreentify.exe"); // already absent: no error
         }
         finally
         {
-            Registry.CurrentUser.DeleteSubKeyTree(@"Software\sScreentify.Tests", throwOnMissingSubKey: false);
+            Registry.CurrentUser.DeleteSubKeyTree(@"Software\SScreentify.Tests", throwOnMissingSubKey: false);
         }
     }
 

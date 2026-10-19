@@ -1,20 +1,22 @@
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Runtime.InteropServices;
+using System.Windows.Threading;
+using Microsoft.Win32;
 using SScreentify.App.Ui;
 using Forms = System.Windows.Forms;
 
 namespace SScreentify.App.Services;
 
-/// <summary>Notification-area icon with the app menu.</summary>
+/// <summary>Notification-area icon with the app menu. The mark follows the taskbar theme (white on dark, ink on light).</summary>
 public sealed class TrayIcon : IDisposable
 {
     private readonly Forms.NotifyIcon _icon;
-    private readonly Icon _image;
+    private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
+    private System.Drawing.Icon _image;
+    private bool _lightTaskbar, _disposed;
 
     public TrayIcon(string tooltip)
     {
-        _image = CreateIcon(Forms.SystemInformation.SmallIconSize.Width);
+        _lightTaskbar = IsTaskbarLight();
+        _image = CreateImage();
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add(Strings.MenuCapture, null, (_, _) => CaptureRequested?.Invoke());
         menu.Items.Add(Strings.MenuOptions, null, (_, _) => OptionsRequested?.Invoke());
@@ -25,6 +27,7 @@ public sealed class TrayIcon : IDisposable
         _icon = new Forms.NotifyIcon { Icon = _image, ContextMenuStrip = menu, Visible = true };
         _icon.MouseClick += (_, e) => { if (e.Button == Forms.MouseButtons.Left) CaptureRequested?.Invoke(); };
         SetTooltip(tooltip);
+        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
     }
 
     public event Action? CaptureRequested, OptionsRequested, AboutRequested, ExitRequested;
@@ -33,39 +36,34 @@ public sealed class TrayIcon : IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
+        SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
         _icon.Visible = false;
         _icon.ContextMenuStrip?.Dispose();
         _icon.Dispose();
         _image.Dispose();
     }
 
-    /// <summary>Own mark: a selection frame with corner brackets in the accent blue.</summary>
-    internal static Icon CreateIcon(int size)
+    /// <summary>Windows reports the taskbar theme as Personalize\SystemUsesLightTheme = 1; anything else is the dark default.</summary>
+    internal static bool IsTaskbarLight() =>
+        Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "SystemUsesLightTheme", null) is int value
+        && value == 1;
+
+    private System.Drawing.Icon CreateImage() => BrandMark.TrayIcon(Forms.SystemInformation.SmallIconSize.Width, _lightTaskbar);
+
+    private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
-        using var bitmap = new Bitmap(size, size);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            var stroke = Math.Max(1.5f, size / 10f);
-            var inset = stroke;
-            var span = size - 2 * inset;
-            var arm = span * 0.36f;
-            using var pen = new Pen(Color.FromArgb(0x60, 0xA5, 0xFA), stroke) { StartCap = LineCap.Round, EndCap = LineCap.Round };
-            float l = inset, t = inset, r = size - inset, b = size - inset;
-            g.DrawLines(pen, new[] { new PointF(l, t + arm), new PointF(l, t), new PointF(l + arm, t) });
-            g.DrawLines(pen, new[] { new PointF(r - arm, t), new PointF(r, t), new PointF(r, t + arm) });
-            g.DrawLines(pen, new[] { new PointF(r, b - arm), new PointF(r, b), new PointF(r - arm, b) });
-            g.DrawLines(pen, new[] { new PointF(l + arm, b), new PointF(l, b), new PointF(l, b - arm) });
-            using var dot = new SolidBrush(Color.FromArgb(0xF4, 0x3F, 0x5E));
-            var d = size * 0.28f;
-            g.FillEllipse(dot, (size - d) / 2, (size - d) / 2, d, d);
-        }
-
-        var handle = bitmap.GetHicon();
-        try { return (Icon)Icon.FromHandle(handle).Clone(); }
-        finally { DestroyIcon(handle); }
+        // Raised on a system thread; the icon belongs to the UI thread.
+        if (e.Category == UserPreferenceCategory.General)
+            _dispatcher.BeginInvoke(() =>
+            {
+                var light = IsTaskbarLight();
+                if (_disposed || light == _lightTaskbar) return;
+                _lightTaskbar = light;
+                var old = _image;
+                _image = CreateImage();
+                _icon.Icon = _image;
+                old.Dispose();
+            });
     }
-
-    [DllImport("user32.dll")]
-    private static extern bool DestroyIcon(IntPtr handle);
 }

@@ -42,6 +42,7 @@ public partial class App : Application
         // rendering stays under the 60 MB idle target with the same ~30 ms open time. --gpu-render opts back in.
         if (!e.Args.Contains("--gpu-render")) System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
+        // Kept lower-case on purpose: kernel object names are case-sensitive, so renaming it would let an older build run alongside.
         _singleInstance = new Mutex(initiallyOwned: true, @"Local\sScreentify.SingleInstance", out var createdNew);
         if (!createdNew)
         {

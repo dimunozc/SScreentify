@@ -24,7 +24,7 @@ public sealed class HotkeyService : IDisposable
 
     public HotkeyService()
     {
-        _source = new HwndSource(new HwndSourceParameters("sScreentify.Hotkeys") { ParentWindow = HwndMessage, Width = 0, Height = 0 });
+        _source = new HwndSource(new HwndSourceParameters("SScreentify.Hotkeys") { ParentWindow = HwndMessage, Width = 0, Height = 0 });
         _source.AddHook(WndProc);
     }
 

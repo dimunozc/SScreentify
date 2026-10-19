@@ -25,7 +25,7 @@ public class VisualSnapshotTests
         // pack:// URIs resolve only once a WPF Application exists in the process.
         lock (typeof(VisualSnapshotTests))
             if (Application.Current is null) _ = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
-        return new ResourceDictionary { Source = new Uri("pack://application:,,,/sScreentify;component/Ui/Theme.xaml") };
+        return new ResourceDictionary { Source = new Uri("pack://application:,,,/SScreentify;component/Ui/Theme.xaml") };
     }
 
     internal static PixelBuffer SyntheticDesktop(int w, int h)
@@ -112,7 +112,7 @@ public class VisualSnapshotTests
         {
             var theme = LoadTheme();
             Save(Snapshot(new OptionsWindow(new AppSettings { Format = ImageFormat.Jpeg }), theme, 560), "options.png");
-            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastSaved, @"C:\Users\Diego\Pictures\sScreentify\Captura_2026-10-17_16-52-03.png"), () => { }, false), theme, 400), "toast.png");
+            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastSaved, @"C:\Users\Diego\Pictures\SScreentify\Captura_2026-10-17_16-52-03.png"), () => { }, false), theme, 400), "toast.png");
             Save(Snapshot(new ToastWindow(string.Format(Strings.ToastHotkeyFailed, "Ctrl + Mayús + Impr Pant"), () => { }, true), theme, 400), "toast-error.png");
             Save(Snapshot(new AboutWindow(), theme, 380), "about.png");
         });

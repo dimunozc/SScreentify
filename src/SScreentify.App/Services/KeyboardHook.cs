@@ -23,7 +23,7 @@ internal sealed class KeyboardHook : IDisposable
         _interceptor = interceptor;
         _fired = fired;
         _callback = Callback;
-        _thread = new Thread(Run) { IsBackground = true, Name = "sScreentify.KeyboardHook", Priority = ThreadPriority.AboveNormal };
+        _thread = new Thread(Run) { IsBackground = true, Name = "SScreentify.KeyboardHook", Priority = ThreadPriority.AboveNormal };
     }
 
     /// <summary>Installs the hook and returns null if Windows refuses it.</summary>

@@ -26,7 +26,7 @@ public sealed class ToastWindow : Window
         ShowInTaskbar = false;
         ResizeMode = ResizeMode.NoResize;
         SizeToContent = SizeToContent.WidthAndHeight;
-        Title = "sScreentify";
+        Title = "SScreentify";
 
         var text = new TextBlock
         {

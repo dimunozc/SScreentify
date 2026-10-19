@@ -7,7 +7,7 @@ namespace SScreentify.Core.Tests;
 
 public sealed class SettingsStoreTests : IDisposable
 {
-    private readonly string _dir = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), "SScreentify.Tests", Guid.NewGuid().ToString("N"));
     private string SettingsPath => Path.Combine(_dir, "settings.json");
 
     public void Dispose()

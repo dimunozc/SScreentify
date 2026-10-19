@@ -5,7 +5,7 @@ namespace SScreentify.App.Services;
 /// <summary>The "start with Windows" entry under a Run key (HKCU\Software\Microsoft\Windows\CurrentVersion\Run in the app).</summary>
 public sealed class AutoStart
 {
-    private const string ValueName = "sScreentify";
+    private const string ValueName = "SScreentify";
     private readonly RegistryKey _runKey;
 
     public AutoStart(RegistryKey runKeyRoot) => _runKey = runKeyRoot;
