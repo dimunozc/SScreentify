@@ -23,7 +23,7 @@ public sealed class TrayIcon : IDisposable
         menu.Items.Add(Strings.MenuExit, null, (_, _) => ExitRequested?.Invoke());
 
         _icon = new Forms.NotifyIcon { Icon = _image, ContextMenuStrip = menu, Visible = true };
-        _icon.DoubleClick += (_, _) => CaptureRequested?.Invoke();
+        _icon.MouseClick += (_, e) => { if (e.Button == Forms.MouseButtons.Left) CaptureRequested?.Invoke(); };
         SetTooltip(tooltip);
     }
 

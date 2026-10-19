@@ -1,6 +1,5 @@
 using SScreentify.Core.Files;
 using SScreentify.Core.Geometry;
-using SScreentify.Core.Platform;
 using SScreentify.Core.Settings;
 
 namespace SScreentify.Core.Tests;
@@ -14,15 +13,6 @@ public class FileNamingTests
     public void DefaultName_Formats(ImageFormat format, string expected)
     {
         Assert.Equal(expected, FileNaming.DefaultName(new DateTime(2026, 10, 17, 16, 52, 3), format));
-    }
-
-    [Fact]
-    public void IsPrintScreenTaken_OnlyForIntOne()
-    {
-        Assert.True(SnippingToolConflict.IsPrintScreenTaken(1));
-        Assert.False(SnippingToolConflict.IsPrintScreenTaken(0));
-        Assert.False(SnippingToolConflict.IsPrintScreenTaken(null));
-        Assert.False(SnippingToolConflict.IsPrintScreenTaken("1"));
     }
 
     [Fact]

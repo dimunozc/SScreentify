@@ -16,7 +16,7 @@ public sealed class ToastWindow : Window
     private const int GWL_EXSTYLE = -20, WS_EX_NOACTIVATE = 0x08000000, WS_EX_TOOLWINDOW = 0x00000080;
     private readonly DispatcherTimer _timer;
 
-    public ToastWindow(string message, Action? onClick, string? buttonText, Action? onButton, bool isError)
+    public ToastWindow(string message, Action? onClick, bool isError)
     {
         WindowStyle = WindowStyle.None;
         AllowsTransparency = true;
@@ -44,25 +44,11 @@ public sealed class ToastWindow : Window
         row.Children.Add(dot);
         row.Children.Add(text);
 
-        var stack = new StackPanel();
-        stack.Children.Add(row);
-        if (buttonText is not null)
-        {
-            var button = new Button
-            {
-                Content = buttonText, Margin = new Thickness(18, 10, 0, 0), Padding = new Thickness(12, 4, 12, 4),
-                HorizontalAlignment = HorizontalAlignment.Left, Foreground = Brushes.White, Background = Palette.Accent,
-                BorderThickness = new Thickness(0), FontFamily = Palette.Font, Cursor = Cursors.Hand,
-            };
-            button.Click += (_, e) => { e.Handled = true; onButton?.Invoke(); Close(); };
-            stack.Children.Add(button);
-        }
-
         Content = new Border
         {
             Background = new SolidColorBrush(Color.FromArgb(0xF2, 0x1C, 0x20, 0x2C)),
             BorderBrush = Palette.PanelBorder, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(12),
-            Padding = new Thickness(14, 10, 14, 12), Margin = new Thickness(12), MaxWidth = 360, Child = stack,
+            Padding = new Thickness(14, 10, 14, 12), Margin = new Thickness(12), MaxWidth = 360, Child = row,
             Effect = new DropShadowEffect { BlurRadius = 24, Opacity = 0.45, ShadowDepth = 4, Direction = 270 },
             Cursor = onClick is null ? Cursors.Arrow : Cursors.Hand,
         };

@@ -112,8 +112,8 @@ public class VisualSnapshotTests
         {
             var theme = LoadTheme();
             Save(Snapshot(new OptionsWindow(new AppSettings { Format = ImageFormat.Jpeg }), theme, 560), "options.png");
-            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastSaved, @"C:\Users\Diego\Pictures\sScreentify\Captura_2026-10-17_16-52-03.png"), () => { }, null, null, false), theme, 400), "toast.png");
-            Save(Snapshot(new ToastWindow(Strings.ToastSnippingConflict, null, Strings.ButtonOpenWindowsSettings, () => { }, true), theme, 400), "toast-error.png");
+            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastSaved, @"C:\Users\Diego\Pictures\sScreentify\Captura_2026-10-17_16-52-03.png"), () => { }, false), theme, 400), "toast.png");
+            Save(Snapshot(new ToastWindow(string.Format(Strings.ToastHotkeyFailed, "Ctrl + Mayús + Impr Pant"), () => { }, true), theme, 400), "toast-error.png");
             Save(Snapshot(new AboutWindow(), theme, 380), "about.png");
         });
     }

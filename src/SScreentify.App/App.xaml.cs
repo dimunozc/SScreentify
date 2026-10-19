@@ -1,14 +1,11 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Threading;
-using Microsoft.Win32;
 using SScreentify.App.Diagnostics;
 using SScreentify.App.Export;
 using SScreentify.App.Overlay;
 using SScreentify.App.Services;
 using SScreentify.App.Ui;
 using SScreentify.Core.Hotkeys;
-using SScreentify.Core.Platform;
 using SScreentify.Core.Settings;
 
 namespace SScreentify.App;
@@ -25,7 +22,6 @@ public partial class App : Application
     private OptionsWindow? _options;
     private AboutWindow? _about;
     private HotkeySetting? _failedHotkey;
-    private bool _printScreenTakenBySnipping;
 
     internal AppSettings Settings { get; private set; } = new();
 
@@ -107,19 +103,11 @@ public partial class App : Application
         _failedHotkey = null;
         if (!_hotkeys!.Register(HotkeyId.Main, Settings.MainHotkey)) _failedHotkey = Settings.MainHotkey;
         if (!_hotkeys.Register(HotkeyId.SaveFullscreen, Settings.SaveFullscreenHotkey)) _failedHotkey ??= Settings.SaveFullscreenHotkey;
-
-        var main = Settings.MainHotkey;
-        var usesBarePrintScreen = main.Enabled && main.Modifiers == HotkeyModifiers.None && main.VirtualKey == HotkeyRules.VkSnapshot;
-        _printScreenTakenBySnipping = usesBarePrintScreen && SnippingToolConflict.IsPrintScreenTaken(
-            Registry.GetValue(@"HKEY_CURRENT_USER\Control Panel\Keyboard", "PrintScreenKeyForSnippingEnabled", null));
     }
 
     private void ShowHotkeyNotices()
     {
-        if (_printScreenTakenBySnipping)
-            _toasts.Show(Strings.ToastSnippingConflict, buttonText: Strings.ButtonOpenWindowsSettings, isError: true,
-                onButton: () => Process.Start(new ProcessStartInfo("ms-settings:easeofaccess-keyboard") { UseShellExecute = true }));
-        else if (_failedHotkey is { } failed)
+        if (_failedHotkey is { } failed)
             _toasts.Show(string.Format(Strings.ToastHotkeyFailed, HotkeyRules.Display(failed)), onClick: ShowOptions, isError: true);
     }
 

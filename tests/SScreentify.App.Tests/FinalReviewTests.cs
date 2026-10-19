@@ -18,7 +18,7 @@ public class FinalReviewTests
     {
         public List<(string Message, bool IsError)> Shown { get; } = new();
 
-        public void Show(string message, Action? onClick = null, string? buttonText = null, Action? onButton = null, bool isError = false) =>
+        public void Show(string message, Action? onClick = null, bool isError = false) =>
             Shown.Add((message, isError));
     }
 

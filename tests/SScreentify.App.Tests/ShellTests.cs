@@ -1,3 +1,5 @@
+using System.Windows.Interop;
+using SScreentify.App.Native;
 using SScreentify.App.Services;
 using SScreentify.App.Ui;
 using SScreentify.Core.Hotkeys;
@@ -47,10 +49,33 @@ public class ShellTests
     }
 
     [Fact]
+    public void HotkeyService_PrintScreen_IsInterceptedEvenWhenAlreadyRegisteredElsewhere()
+    {
+        StaRunner.Run(() =>
+        {
+            // Simulates Windows 11 reserving the key: another window already owns the RegisterHotKey registration.
+            var printScreen = new HotkeySetting(true, HotkeyModifiers.Control | HotkeyModifiers.Alt | HotkeyModifiers.Shift, HotkeyRules.VkSnapshot);
+            using var owner = new HwndSource(new HwndSourceParameters("taken"));
+            Assert.True(User32.RegisterHotKey(owner.Handle, 99, (uint)printScreen.Modifiers, (uint)printScreen.VirtualKey));
+            try
+            {
+                using var service = new HotkeyService();
+                Assert.True(service.Register(HotkeyId.Main, printScreen));
+                Assert.True(service.Register(HotkeyId.Main, printScreen)); // re-registering replaces the binding
+                service.Unregister(HotkeyId.Main);
+            }
+            finally
+            {
+                User32.UnregisterHotKey(owner.Handle, 99);
+            }
+        });
+    }
+
+    [Fact]
     public void Strings_EveryPropertyResolves()
     {
         var properties = typeof(Strings).GetProperties().Where(p => p.PropertyType == typeof(string)).ToList();
-        Assert.Equal(62, properties.Count);
+        Assert.Equal(60, properties.Count);
         foreach (var p in properties)
             Assert.False(string.IsNullOrWhiteSpace((string?)p.GetValue(null)), p.Name);
     }

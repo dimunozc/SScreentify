@@ -20,8 +20,6 @@ public static class Strings
     public static string ToastCopyBusy => Get(nameof(ToastCopyBusy));
     public static string ToastSaveFailed => Get(nameof(ToastSaveFailed));
     public static string ToastHotkeyFailed => Get(nameof(ToastHotkeyFailed));
-    public static string ToastSnippingConflict => Get(nameof(ToastSnippingConflict));
-    public static string ButtonOpenWindowsSettings => Get(nameof(ButtonOpenWindowsSettings));
     public static string SettingsCorrupt => Get(nameof(SettingsCorrupt));
     public static string HotkeyInvalid => Get(nameof(HotkeyInvalid));
     public static string HotkeyDuplicate => Get(nameof(HotkeyDuplicate));

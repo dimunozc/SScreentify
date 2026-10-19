@@ -14,8 +14,6 @@
   <data name="ToastCopyBusy" xml:space="preserve"><value>No se pudo copiar: el portapapeles está ocupado por otra aplicación.</value></data>
   <data name="ToastSaveFailed" xml:space="preserve"><value>No se pudo guardar la captura: {0}</value></data>
   <data name="ToastHotkeyFailed" xml:space="preserve"><value>No se pudo registrar el atajo {0}. Probablemente otra aplicación ya lo usa. Haz clic aquí para abrir Opciones.</value></data>
-  <data name="ToastSnippingConflict" xml:space="preserve"><value>Windows tiene asignada la tecla Impr Pant a la herramienta Recortes. Desactívalo para usarla con sScreentify.</value></data>
-  <data name="ButtonOpenWindowsSettings" xml:space="preserve"><value>Abrir configuración de Windows</value></data>
   <data name="SettingsCorrupt" xml:space="preserve"><value>La configuración estaba dañada. Se guardó una copia en settings.json.bak y se restauraron los valores por defecto.</value></data>
   <data name="HotkeyInvalid" xml:space="preserve"><value>Uno de tus atajos no es válido. Si quieres desactivarlo, desmarca su casilla.</value></data>
   <data name="HotkeyDuplicate" xml:space="preserve"><value>No puedes asignar el mismo atajo a dos funciones. Cambia uno de ellos.</value></data>

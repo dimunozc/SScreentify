@@ -14,7 +14,9 @@ Funciona sin conexión: no hace ninguna petición de red.
 
 ## Impr Pant en Windows 11
 
-Windows 11 puede reservar la tecla Impr Pant para la herramienta Recortes. Si es así, sScreentify muestra un aviso con un botón que abre **Configuración → Accesibilidad → Teclado**. Allí hay que desactivar «Usar la tecla Impr Pant para abrir Recortes». sScreentify nunca cambia esa opción por su cuenta. También puedes asignarle otro atajo en Opciones → Atajos.
+Windows 11 puede reservar la tecla Impr Pant para la herramienta Recortes. No hace falta cambiar nada: mientras sScreentify está abierto, lee los atajos que usan Impr Pant directamente del teclado, abre su selector y no deja que la pulsación llegue a Recortes. No modifica ninguna opción de Windows; al cerrar sScreentify, Impr Pant vuelve a comportarse como antes.
+
+Limitación conocida (comprobada el 19-10-2026): si la ventana activa se ejecuta como administrador, Windows no deja que sScreentify lea el teclado y la tecla abre Recortes. En ese caso, haz clic en el icono de la bandeja.
 
 ## Compilar, probar y publicar
 
