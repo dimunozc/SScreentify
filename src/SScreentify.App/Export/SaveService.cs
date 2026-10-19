@@ -10,22 +10,38 @@ public static class SaveService
 {
     private static readonly ImageFormat[] FilterOrder = { ImageFormat.Png, ImageFormat.Jpeg, ImageFormat.Bmp };
 
-    /// <summary>The last folder if it still exists; otherwise the default folder (created if needed);
-    /// if that cannot be created (unplugged drive, no permission), the fallback (PicturessScreentify).</summary>
+    /// <summary>The last folder if it still exists and accepts new files; otherwise the default folder (created if needed);
+    /// if that cannot be created or written (unplugged drive, no permission), the fallback (Pictures\sScreentify).</summary>
     public static string ResolveInitialFolder(string? lastFolder, string? defaultFolder, string? fallback = null)
     {
-        if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder)) return lastFolder;
+        if (!string.IsNullOrEmpty(lastFolder) && Directory.Exists(lastFolder) && AcceptsNewFiles(lastFolder)) return lastFolder;
         fallback ??= AppPaths.DefaultPicturesFolder;
         var folder = string.IsNullOrEmpty(defaultFolder) ? fallback : defaultFolder;
         try
         {
             Directory.CreateDirectory(folder);
-            return folder;
+            if (AcceptsNewFiles(folder)) return folder;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
-            Directory.CreateDirectory(fallback);
-            return fallback;
+        }
+        Directory.CreateDirectory(fallback);
+        return fallback;
+    }
+
+    /// <summary>Asks the file system itself (permissions are too intricate to predict): creates a uniquely named empty file
+    /// that Windows deletes when it is closed.</summary>
+    private static bool AcceptsNewFiles(string folder)
+    {
+        try
+        {
+            using var probe = new FileStream(Path.Combine(folder, $".sScreentify-{Guid.NewGuid():N}.tmp"), FileMode.CreateNew,
+                FileAccess.Write, FileShare.None, bufferSize: 1, FileOptions.DeleteOnClose);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
         }
     }
 

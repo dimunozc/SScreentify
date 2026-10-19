@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -189,6 +191,36 @@ public class ExportTests
         }
         finally
         {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ResolveInitialFolder_SkipsFoldersWithoutWritePermission()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        var locked = new DirectoryInfo(Path.Combine(root, "solo-lectura"));
+        var deny = new FileSystemAccessRule(WindowsIdentity.GetCurrent().User!, FileSystemRights.CreateFiles, AccessControlType.Deny);
+        try
+        {
+            locked.Create();
+            var acl = locked.GetAccessControl();
+            acl.AddAccessRule(deny);
+            locked.SetAccessControl(acl);
+            var fallback = Path.Combine(root, "Capturas");
+
+            Assert.Equal(fallback, SaveService.ResolveInitialFolder(locked.FullName, null, fallback)); // last folder
+            Assert.Equal(fallback, SaveService.ResolveInitialFolder(null, locked.FullName, fallback)); // default folder
+            Assert.Empty(locked.GetFileSystemInfos());
+        }
+        finally
+        {
+            if (locked.Exists)
+            {
+                var acl = locked.GetAccessControl();
+                acl.RemoveAccessRule(deny);
+                locked.SetAccessControl(acl);
+            }
             if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
         }
     }

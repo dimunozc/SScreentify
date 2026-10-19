@@ -84,6 +84,64 @@ public class CensorTests
     }
 
     [Fact]
+    public void Blur_KeepsUniformColor()
+    {
+        var src = Fill(80, 60, (_, _) => new Rgba(30, 140, 220));
+        var patch = Censor.Blur(src, new PixelRect(10, 10, 50, 30));
+        for (var y = 0; y < patch.Height; y++)
+        for (var x = 0; x < patch.Width; x++)
+            Assert.Equal(new Rgba(30, 140, 220), patch.GetPixel(x, y));
+    }
+
+    [Theory]
+    [InlineData(20, 20, 100, 70)]
+    [InlineData(0, 0, 60, 40)]
+    [InlineData(120, 90, 40, 30)]
+    public void Blur_LooksLikeGaussian(int x, int y, int w, int h)
+    {
+        // Blocks with hard edges plus a gradient: the worst case for approximating a gaussian.
+        var src = Fill(160, 120, (px, py) => ((px / 24) + (py / 24)) % 2 == 0
+            ? new Rgba((byte)(px * 255 / 159), 20, 200)
+            : new Rgba(240, (byte)(py * 2), 10));
+        var region = new PixelRect(x, y, w, h);
+        var patch = Censor.Blur(src, region);
+        var reference = ReferenceGaussian(src, region, Censor.DefaultBlurRadius);
+
+        var worst = 0;
+        for (var py = 0; py < h; py++)
+        for (var px = 0; px < w; px++)
+        {
+            var (a, b) = (patch.GetPixel(px, py), reference(px, py));
+            worst = Math.Max(worst, Math.Max(Math.Abs(a.R - b.R), Math.Max(Math.Abs(a.G - b.G), Math.Abs(a.B - b.B))));
+        }
+        Assert.InRange(worst, 0, 12);
+    }
+
+    /// <summary>Direct separable gaussian, sigma = radius / 2, samples clamped to src: the look Blur must keep.</summary>
+    private static Func<int, int, Rgba> ReferenceGaussian(PixelBuffer src, PixelRect region, int radius)
+    {
+        var sigma = radius / 2.0;
+        var kernel = Enumerable.Range(-radius, 2 * radius + 1).Select(i => Math.Exp(-(i * i) / (2 * sigma * sigma))).ToArray();
+        var total = kernel.Sum();
+        double Channel(int cx, int cy, Func<Rgba, byte> pick)
+        {
+            double sum = 0;
+            for (var ky = -radius; ky <= radius; ky++)
+            for (var kx = -radius; kx <= radius; kx++)
+            {
+                var p = src.GetPixel(Math.Clamp(cx + kx, 0, src.Width - 1), Math.Clamp(cy + ky, 0, src.Height - 1));
+                sum += pick(p) * kernel[kx + radius] * kernel[ky + radius];
+            }
+            return sum / (total * total);
+        }
+        return (px, py) =>
+        {
+            int cx = region.X + px, cy = region.Y + py;
+            return new Rgba((byte)Math.Round(Channel(cx, cy, c => c.R)), (byte)Math.Round(Channel(cx, cy, c => c.G)), (byte)Math.Round(Channel(cx, cy, c => c.B)));
+        };
+    }
+
+    [Fact]
     public void Crop_ClampsAndRejectsEmpty()
     {
         var src = Random(10, 10);

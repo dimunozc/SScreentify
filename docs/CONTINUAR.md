@@ -5,7 +5,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 ## Estado a 19-10-2026
 
 - Las 14 tareas del plan y los arreglos de la revisión final están en `main`.
-- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. 143 pruebas en verde (73 de Core y 70 de la App).
+- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. Después, el diálogo de guardar ya no empieza en una carpeta sin permiso de escritura y el desenfoque es unas 5 veces más rápido (ver «Trampas»). 148 pruebas en verde (77 de Core y 71 de la App).
 - El repositorio es solo local: **no tiene remoto**.
 - Documentos de referencia:
   - Diseño aprobado: `docs/superpowers/specs/2026-10-17-sscreentify-design.md` (lo que la app *debe* hacer; manda sobre todo lo demás).
@@ -15,7 +15,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 
 ```powershell
 cd C:\Users\Diego\Documents\Repositorios\sScreentify
-dotnet test                                   # tienen que pasar las 143
+dotnet test                                   # tienen que pasar las 148
 dotnet run --project src\SScreentify.App      # la app queda en la bandeja; Impr Pant para capturar
 .\scripts\publish.ps1                         # genera publish\sScreentify.exe
 ```
@@ -38,11 +38,9 @@ El 19-10-2026 Diego informó de que había probado todo lo de esta lista. No se 
 
 ## Pendientes conocidos (menores)
 
-Salieron en la revisión final y se dejaron para más adelante:
+Todos los de la revisión final están resueltos salvo uno, que se dejó así a propósito:
 
-- Si la última carpeta existe pero no tiene permiso de escritura, el diálogo empieza igualmente en ella. El error al escribir sí se avisa.
-- El desenfoque de Censurar se recalcula en cada movimiento al arrastrar y puede ir lento en zonas grandes (sin medir). Arreglo propuesto: previsualizar pixelado mientras se arrastra y calcular el desenfoque al soltar.
-- Durante una captura, la imagen se guarda dos veces en memoria: el `PixelBuffer` y el `BitmapSource`.
+- Durante una captura, la imagen está dos veces en memoria: el `PixelBuffer` (lo usan la censura y la exportación) y el `BitmapSource` (lo que se ve). Son unos 8 MB con 1920×1080 y unos 33 MB por monitor 4K (estimación por el tamaño de la imagen, sin medir), y se liberan al cerrar el selector, así que no afectan a la memoria en reposo. Quitar la copia obligaría a que WPF muestre la imagen desde la memoria del `PixelBuffer` (por ejemplo, con `Imaging.CreateBitmapSourceFromMemorySection`) y a cambiar cómo guarda los píxeles el núcleo de la app. No compensaba. Retómalo solo si la memoria durante la captura llega a ser un problema.
 
 ## Mapa del código
 
@@ -76,6 +74,8 @@ Salieron en la revisión final y se dejaron para más adelante:
 - **Textos de la interfaz:** WPF no genera la clase de `Strings.resx`. Para añadir textos usa `node scripts/sync-strings.js "Clave=Texto"`, que regenera `Ui/Strings.cs`. Después actualiza el número esperado en `ShellTests.Strings_EveryPropertyResolves`.
 - **Renderizado por software por defecto** (`App.xaml.cs`): con la GPU, el driver retenía unos 70 MB y no se cumplía el objetivo de 60 MB en reposo. `--gpu-render` vuelve a la GPU. Si cambias esto, vuelve a medir.
 - **Impr Pant en Windows 11:** los atajos con Impr Pant no usan `RegisterHotKey` (Recortes puede tenerla reservada), sino un gancho de teclado de bajo nivel (`Services/KeyboardHook.cs`) en un hilo propio, que se queda con la pulsación. Windows quita sin avisar un gancho que tarda en responder, así que su función no debe esperar nunca al hilo de la interfaz: solo consulta `KeyInterceptor` y encola el atajo con `BeginInvoke`. Con una ventana de administrador en primer plano no recibe teclas (protección de Windows, comprobado el 19-10-2026) y Recortes gana. Se descartó a propósito: arreglarlo exigía ejecutar la app como administrador, firmarla con `uiAccess`, o desactivar la opción de Recortes y registrar también la tecla con `RegisterHotKey`. En este equipo, `RegisterHotKey` acepta Impr Pant aunque Recortes la tenga, pero Recortes gana igualmente.
+- **Desenfoque de Censurar** (`Imaging/Censor.cs`, `Blur`): se recalcula en cada movimiento del ratón, así que tiene que ser rápido. Son tres desenfoques de caja por eje con sumas acumuladas, que dan casi el mismo resultado que el gaussiano (diferencia máxima de 10/255 en bordes duros, comprobada contra una referencia en `CensorTests`). Los métodos llevan `AggressiveOptimization` para que el primer arrastre no vaya con el código sin optimizar. Medido el 19-10-2026 (Release, mediana): 600×400 en 8–10 ms (antes 44–54), 1200×700 en 26–37 ms (antes 150), pantalla completa 1920×1080 en 82 ms (antes 377) y 4K en 256 ms (antes 1430).
+- **Carpeta de guardado** (`Export/SaveService.cs`, `ResolveInitialFolder`): para saber si se puede escribir en una carpeta, crea un archivo vacío `.sScreentify-….tmp` que Windows borra al cerrarlo. Predecir los permisos es poco fiable.
 - **Recursos de WPF compartidos entre hilos** (pinceles y geometrías `static`): tienen que estar congelados (`Freeze()`). Si no, las pruebas fallan con «el propietario es otro subproceso».
 - **Pruebas con WPF:** usa `StaRunner.Run(...)`. `OverlayController` y `ExportActions` aceptan proveedores falsos de captura y monitores, e `IToastSink`, para probar sin abrir ventanas (ver `FinalReviewTests`).
 - **Revisión visual sin abrir la app:** `VisualSnapshotTests` renderiza el selector, Opciones y los avisos sobre un escritorio sintético. Con `SSCREENTIFY_SNAPSHOT_DIR=<carpeta>` guarda los PNG.
