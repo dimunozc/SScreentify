@@ -6,10 +6,11 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 
 - Las 14 tareas del plan y los arreglos de la revisión final están en `main`.
 - 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. Después, el diálogo de guardar ya no empieza en una carpeta sin permiso de escritura y el desenfoque es unas 5 veces más rápido (ver «Trampas»). Por último, el logo de Diego (Claude Design), el nombre «SScreentify» con dos mayúsculas en todos los textos y la interfaz en inglés. 183 pruebas en verde (100 de Core y 83 de la App).
-- El repositorio es solo local: **no tiene remoto**.
-- Documentos de referencia:
+- El repositorio es público: https://github.com/dimunozc/SScreentify (rama `main`). Los commits usan el correo anónimo de GitHub de Diego (`86338445+dimunozc@users.noreply.github.com`).
+- Documentos de referencia **solo en el equipo de Diego**: `docs/superpowers/` está en `.gitignore` y se sacó del historial antes de publicar, porque incluye el análisis de la aplicación de referencia.
   - Diseño aprobado: `docs/superpowers/specs/2026-10-17-sscreentify-design.md` (lo que la app *debe* hacer; manda sobre todo lo demás).
   - Plan de implementación: `docs/superpowers/plans/2026-10-17-sscreentify.md`.
+  - Si trabajas en otro equipo sin esa carpeta, el README y este documento describen el comportamiento actual.
 
 ## Primeros pasos al retomar
 
