@@ -9,6 +9,37 @@ public class ToolbarPlacementTests
     private static readonly PixelSize Actions = new(200, 40);
     private const int Gap = 8;
 
+    private static readonly MonitorInfo Top = new(new PixelRect(0, 0, 1920, 1080), new PixelRect(0, 0, 1920, 1040), 1.0, true);
+    private static readonly MonitorInfo Below = new(new PixelRect(0, 1080, 1920, 1080), new PixelRect(0, 1080, 1920, 1040), 1.5, false);
+
+    [Fact]
+    public void SizeLabelFitsAbove_WhenRoomAboveOnSameMonitor()
+    {
+        Assert.True(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 1200, 300, 200), 30, new[] { Top, Below }));
+    }
+
+    [Fact]
+    public void SizeLabelFitsAbove_NotAtTopOfDesktop()
+    {
+        Assert.False(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 10, 300, 200), 30, new[] { Top, Below }));
+    }
+
+    [Fact]
+    public void SizeLabelFitsAbove_UsesMonitorAboveTheBoundary()
+    {
+        // Just below the boundary: the label goes on the upper monitor, so every window agrees and it is drawn once.
+        Assert.True(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 1085, 300, 200), 30, new[] { Top, Below }));
+        Assert.False(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 1085, 300, 200), 30, new[] { Below }));
+    }
+
+    [Fact]
+    public void SizeLabelFitsAbove_ScalesWithSelectionMonitorDpi()
+    {
+        // 30 DIP at 150 % is 45 physical pixels.
+        Assert.True(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 1125, 300, 200), 30, new[] { Below }));
+        Assert.False(ToolbarPlacement.SizeLabelFitsAbove(new PixelRect(100, 1124, 300, 200), 30, new[] { Below }));
+    }
+
     [Fact]
     public void PlaceVertical_RightWhenFits()
     {

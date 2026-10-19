@@ -193,6 +193,24 @@ public class ExportTests
         }
     }
 
+    [Fact]
+    public void Write_WhenReplaceFails_LeavesNoTempFile()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            // A folder where the image should go makes the final move fail after the temporary file is written.
+            var target = Path.Combine(root, "Captura.png");
+            Directory.CreateDirectory(target);
+            Assert.ThrowsAny<Exception>(() => SaveService.Write(target, new byte[] { 1, 2, 3 }));
+            Assert.Equal(new[] { target }, Directory.GetFileSystemEntries(root));
+        }
+        finally
+        {
+            if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
+        }
+    }
+
     [Theory]
     [InlineData(@"C:\a\b.png", ImageFormat.Png)]
     [InlineData(@"C:\a\b.JPG", ImageFormat.Jpeg)]

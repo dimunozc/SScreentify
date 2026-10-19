@@ -49,8 +49,8 @@ public sealed class SelectionAdorner : FrameworkElement
             new Typeface(Palette.Font, FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal), 12, Palette.Text,
             VisualTreeHelper.GetDpi(this).PixelsPerDip);
         var pill = new Size(text.Width + 16, text.Height + 6);
-        var y = selRect.Top - pill.Height - 6;
-        if (y < 0) y = selRect.Top + 6;
+        var above = ToolbarPlacement.SizeLabelFitsAbove(sel, pill.Height + 6, Session!.Capture.Monitors);
+        var y = above ? selRect.Top - pill.Height - 6 : selRect.Top + 6;
         var box = new Rect(new Point(selRect.Left, y), pill);
         dc.DrawRoundedRectangle(Palette.Pill, null, box, 6, 6);
         dc.DrawText(text, new Point(box.Left + 8, box.Top + 3));

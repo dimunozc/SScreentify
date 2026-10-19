@@ -16,6 +16,19 @@ public class FileNamingTests
     }
 
     [Fact]
+    public void AvailablePath_KeepsNameWhenFree()
+    {
+        Assert.Equal(Path.Combine("f", "Captura.png"), FileNaming.AvailablePath("f", "Captura.png", _ => false));
+    }
+
+    [Fact]
+    public void AvailablePath_NumbersTakenNames()
+    {
+        var taken = new HashSet<string> { Path.Combine("f", "Captura.png"), Path.Combine("f", "Captura (2).png") };
+        Assert.Equal(Path.Combine("f", "Captura (3).png"), FileNaming.AvailablePath("f", "Captura.png", taken.Contains));
+    }
+
+    [Fact]
     public void MonitorInfo_IsValueEqual()
     {
         var a = new MonitorInfo(new PixelRect(0, 0, 10, 10), new PixelRect(0, 0, 10, 9), 1.5, true);

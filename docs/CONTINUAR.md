@@ -5,7 +5,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 ## Estado a 19-10-2026
 
 - Las 14 tareas del plan y los arreglos de la revisión final están en `main`.
-- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. 135 pruebas en verde (67 de Core y 68 de la App).
+- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. 143 pruebas en verde (73 de Core y 70 de la App).
 - El repositorio es solo local: **no tiene remoto**.
 - Documentos de referencia:
   - Diseño aprobado: `docs/superpowers/specs/2026-10-17-sscreentify-design.md` (lo que la app *debe* hacer; manda sobre todo lo demás).
@@ -15,7 +15,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 
 ```powershell
 cd C:\Users\Diego\Documents\Repositorios\sScreentify
-dotnet test                                   # tienen que pasar las 135
+dotnet test                                   # tienen que pasar las 143
 dotnet run --project src\SScreentify.App      # la app queda en la bandeja; Impr Pant para capturar
 .\scripts\publish.ps1                         # genera publish\sScreentify.exe
 ```
@@ -40,11 +40,8 @@ El 19-10-2026 Diego informó de que había probado todo lo de esta lista. No se 
 
 Salieron en la revisión final y se dejaron para más adelante:
 
-- Si falla un guardado, puede quedar un archivo `*.tmp` junto al destino (`Export/SaveService.cs`, `Write`).
-- Dos guardados instantáneos en el mismo segundo sobrescriben el primero (`Export/ExportActions.cs`, `SaveFullscreenInstant`).
 - Si la última carpeta existe pero no tiene permiso de escritura, el diálogo empieza igualmente en ella. El error al escribir sí se avisa.
 - El desenfoque de Censurar se recalcula en cada movimiento al arrastrar y puede ir lento en zonas grandes (sin medir). Arreglo propuesto: previsualizar pixelado mientras se arrastra y calcular el desenfoque al soltar.
-- La etiqueta de tamaño puede salir dos veces si la selección empieza justo debajo del borde entre dos monitores (`Overlay/SelectionAdorner.cs`).
 - Durante una captura, la imagen se guarda dos veces en memoria: el `PixelBuffer` y el `BitmapSource`.
 
 ## Mapa del código

@@ -52,11 +52,20 @@ public static class SaveService
             _ => fallback,
         };
 
-    /// <summary>Writes through a temporary file so a failed write never leaves a truncated image.</summary>
+    /// <summary>Writes through a temporary file so a failed write never leaves a truncated image, nor the temporary file.</summary>
     public static void Write(string path, byte[] data)
     {
         var temp = path + ".tmp";
-        File.WriteAllBytes(temp, data);
-        File.Move(temp, path, overwrite: true);
+        try
+        {
+            File.WriteAllBytes(temp, data);
+            File.Move(temp, path, overwrite: true);
+        }
+        catch
+        {
+            try { File.Delete(temp); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            throw;
+        }
     }
 }

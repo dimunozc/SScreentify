@@ -106,6 +106,28 @@ public class FinalReviewTests
     }
 
     [Fact]
+    public void SaveFullscreenInstant_TwiceInARowKeepsBothFiles()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), "sScreentify.Tests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            StaRunner.Run(() =>
+            {
+                var toasts = new RecordingToasts();
+                var export = new ExportActions(Headless(), () => new AppSettings { DefaultFolder = folder }, _ => { }, toasts, _ => Synthetic());
+                export.SaveFullscreenInstant();
+                export.SaveFullscreenInstant();
+                Assert.DoesNotContain(toasts.Shown, t => t.IsError);
+            });
+            Assert.Equal(2, Directory.GetFiles(folder, "*.png").Length);
+        }
+        finally
+        {
+            if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
     public void SaveFullscreenInstant_CaptureFailureShowsError()
     {
         StaRunner.Run(() =>

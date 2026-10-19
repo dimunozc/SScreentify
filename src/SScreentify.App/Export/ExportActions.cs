@@ -101,7 +101,7 @@ public sealed class ExportActions
         {
             var capture = _capture(settings.CaptureCursor);
             var folder = SaveService.ResolveInitialFolder(null, settings.DefaultFolder);
-            var path = Path.Combine(folder, FileNaming.DefaultName(DateTime.Now, settings.Format));
+            var path = FileNaming.AvailablePath(folder, FileNaming.DefaultName(DateTime.Now, settings.Format), File.Exists);
             SaveService.Write(path, ImageEncoder.Encode(capture.Pixels, settings.Format, settings.JpegQuality));
             NotifySaved(path);
         }

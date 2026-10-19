@@ -3,6 +3,19 @@ namespace SScreentify.Core.Geometry;
 /// <summary>Places toolbars next to the selection, inside the selection's monitor.</summary>
 public static class ToolbarPlacement
 {
+    /// <summary>
+    /// Whether the size label (<paramref name="heightDip"/> tall, gap included) fits above the selection on some monitor;
+    /// otherwise it goes inside. Decided once in virtual-desktop pixels so every monitor's window agrees and the label is
+    /// drawn once, even when the selection starts just below the boundary between two monitors.
+    /// </summary>
+    public static bool SizeLabelFitsAbove(PixelRect selection, double heightDip, IReadOnlyList<MonitorInfo> monitors)
+    {
+        var origin = new PixelPoint(selection.X, selection.Y);
+        var scale = monitors.FirstOrDefault(m => m.Bounds.Contains(origin))?.DpiScale ?? 1.0;
+        var top = origin with { Y = selection.Y - (int)Math.Ceiling(heightDip * scale) };
+        return monitors.Any(m => m.Bounds.Contains(top));
+    }
+
     public static PixelRect PlaceVertical(PixelRect selection, PixelSize bar, PixelRect monitor, int gap)
     {
         int x, y = selection.Y;
