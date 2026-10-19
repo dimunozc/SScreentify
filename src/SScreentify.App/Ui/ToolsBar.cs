@@ -33,7 +33,8 @@ public sealed class ToolsBar : UserControl
         var stack = new StackPanel { Orientation = Orientation.Vertical };
         foreach (var (tool, icon, tip) in ToolDefs)
         {
-            var button = new ToggleButton { Content = Icons.Create(icon), ToolTip = tip(), Tag = tool };
+            var button = new ToggleButton { Content = Icons.Create(icon), Tag = tool };
+            Texts.Add(() => button.ToolTip = tip());
             button.SetResourceReference(StyleProperty, "GlassButton");
             button.Click += (_, _) => Toggle(tool);
             _tools[tool] = button;
@@ -41,10 +42,10 @@ public sealed class ToolsBar : UserControl
         }
 
         stack.Children.Add(Separator());
-        ColorButton = Button(_swatch, Strings.ToolColor, () => ColorRequested?.Invoke());
+        ColorButton = Button(_swatch, Texts, () => Strings.ToolColor, () => ColorRequested?.Invoke());
         stack.Children.Add(ColorButton);
-        stack.Children.Add(Button(Icons.Create(Icons.Undo), Strings.ToolUndo, () => UndoRequested?.Invoke()));
-        stack.Children.Add(Button(Icons.Create(Icons.Redo), Strings.ToolRedo, () => RedoRequested?.Invoke()));
+        stack.Children.Add(Button(Icons.Create(Icons.Undo), Texts, () => Strings.ToolUndo, () => UndoRequested?.Invoke()));
+        stack.Children.Add(Button(Icons.Create(Icons.Redo), Texts, () => Strings.ToolRedo, () => RedoRequested?.Invoke()));
 
         Panel = new GlassPanel { Content = stack };
         Content = Panel;
@@ -52,6 +53,7 @@ public sealed class ToolsBar : UserControl
 
     public GlassPanel Panel { get; }
     public Button ColorButton { get; }
+    public LocalizedTexts Texts { get; } = new();
 
     public CaptureSession? Session
     {
@@ -84,9 +86,10 @@ public sealed class ToolsBar : UserControl
         _swatch.Fill = new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
     }
 
-    internal static Button Button(object content, string tip, Action onClick, bool primary = false)
+    internal static Button Button(object content, LocalizedTexts texts, Func<string> tip, Action onClick, bool primary = false)
     {
-        var button = new Button { Content = content, ToolTip = tip };
+        var button = new Button { Content = content };
+        texts.Add(() => button.ToolTip = tip());
         button.SetResourceReference(StyleProperty, primary ? "PrimaryGlassButton" : "GlassButton");
         button.Click += (_, _) => onClick();
         return button;

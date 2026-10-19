@@ -60,6 +60,9 @@ public sealed class OverlayController
     public event Action<Exception>? Failed;
     public event Action<CaptureSession>? CopyRequested, SaveRequested, PrintRequested;
 
+    /// <summary>Re-reads the toolbar texts after the interface language changed; safe while a capture is open.</summary>
+    public void RefreshTexts() => _chrome.RefreshTexts();
+
     public void Prewarm()
     {
         foreach (var monitor in _monitors())

@@ -24,10 +24,11 @@ public sealed class ColorPalette : UserControl
                 Background = new SolidColorBrush(Color.FromRgb(c.R, c.G, c.B)),
                 BorderBrush = new SolidColorBrush(Color.FromArgb(0x40, 255, 255, 255)), BorderThickness = new Thickness(1),
             };
-            grid.Children.Add(ToolsBar.Button(swatch, hex, () => ColorChosen?.Invoke(c)));
+            grid.Children.Add(ToolsBar.Button(swatch, Texts, () => hex, () => ColorChosen?.Invoke(c)));
         }
 
-        var custom = new Button { Content = Strings.PaletteCustom, Margin = new Thickness(1, 4, 1, 0), Height = 26, Width = double.NaN };
+        var custom = new Button { Margin = new Thickness(1, 4, 1, 0), Height = 26, Width = double.NaN };
+        Texts.Add(() => custom.Content = Strings.PaletteCustom);
         custom.SetResourceReference(StyleProperty, "GlassButton");
         custom.Width = double.NaN;
         custom.SetResourceReference(Control.FontFamilyProperty, "UiFont");
@@ -38,6 +39,8 @@ public sealed class ColorPalette : UserControl
         stack.Children.Add(custom);
         Content = new GlassPanel { Content = stack };
     }
+
+    public LocalizedTexts Texts { get; } = new();
 
     public event Action<Rgba>? ColorChosen;
 

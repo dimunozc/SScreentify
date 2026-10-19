@@ -5,7 +5,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 ## Estado a 19-10-2026
 
 - Las 14 tareas del plan y los arreglos de la revisión final están en `main`.
-- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. Después, el diálogo de guardar ya no empieza en una carpeta sin permiso de escritura y el desenfoque es unas 5 veces más rápido (ver «Trampas»). 148 pruebas en verde (77 de Core y 71 de la App).
+- 19-10-2026: Impr Pant tiene prioridad sobre Recortes de Windows (ver «Trampas») y un clic izquierdo en el icono de la bandeja inicia una captura. También se arreglaron tres pendientes de la revisión final: el `.tmp` tras un guardado fallido, los guardados instantáneos en el mismo segundo (ahora se numeran: «Captura_… (2).png») y la etiqueta de tamaño duplicada entre monitores. Después, el diálogo de guardar ya no empieza en una carpeta sin permiso de escritura y el desenfoque es unas 5 veces más rápido (ver «Trampas»). Por último, el logo de Diego (Claude Design), el nombre «SScreentify» con dos mayúsculas en todos los textos y la interfaz en inglés. 183 pruebas en verde (100 de Core y 83 de la App).
 - El repositorio es solo local: **no tiene remoto**.
 - Documentos de referencia:
   - Diseño aprobado: `docs/superpowers/specs/2026-10-17-sscreentify-design.md` (lo que la app *debe* hacer; manda sobre todo lo demás).
@@ -15,7 +15,7 @@ Notas para retomar el proyecto otro día, con Claude o sin él. El README explic
 
 ```powershell
 cd C:\Users\Diego\Documents\Repositorios\sScreentify
-dotnet test                                   # tienen que pasar las 148
+dotnet test                                   # tienen que pasar las 183
 dotnet run --project src\SScreentify.App      # la app queda en la bandeja; Impr Pant para capturar
 .\scripts\publish.ps1                         # genera publish\SScreentify.exe
 ```
@@ -71,7 +71,8 @@ Todos los de la revisión final están resueltos salvo uno, que se dejó así a 
 
 ## Trampas que conviene saber
 
-- **Textos de la interfaz:** WPF no genera la clase de `Strings.resx`. Para añadir textos usa `node scripts/sync-strings.js "Clave=Texto"`, que regenera `Ui/Strings.cs`. Después actualiza el número esperado en `ShellTests.Strings_EveryPropertyResolves`.
+- **Textos de la interfaz:** están en `Ui/Strings.resx` (español, el idioma neutro) y `Ui/Strings.en.resx` (inglés). WPF no genera la clase, así que para añadir un texto usa `node scripts/sync-strings.js "Clave=Texto" "Clave@en=Text"`, que lo añade a los dos archivos y regenera `Ui/Strings.cs`. Después actualiza el número esperado en `ShellTests.Strings_EveryPropertyResolves`. `LanguageTests` falla si un archivo tiene claves que el otro no tiene, o si no coinciden los `{0}`.
+- **Idioma:** `Ui/UiLanguage.cs` es el único sitio que convierte el ajuste en el idioma de `Strings` (no se llama `Localization` porque WPF ya tiene `System.Windows.Localization`). Las ventanas que se crean al abrirlas (Opciones, Acerca de, avisos) ya salen en el idioma nuevo. Lo que vive toda la sesión (menú de la bandeja y barras del selector) registra sus textos en un `LocalizedTexts` y los vuelve a leer con `RefreshTexts()`. Un control nuevo de larga vida tiene que hacer lo mismo. Los nombres de teclas y el prefijo de archivo están en el núcleo (`HotkeyRules.Display` y `FileNaming.DefaultName` reciben el `Language`).
 - **Renderizado por software por defecto** (`App.xaml.cs`): con la GPU, el driver retenía unos 70 MB y no se cumplía el objetivo de 60 MB en reposo. `--gpu-render` vuelve a la GPU. Si cambias esto, vuelve a medir.
 - **Impr Pant en Windows 11:** los atajos con Impr Pant no usan `RegisterHotKey` (Recortes puede tenerla reservada), sino un gancho de teclado de bajo nivel (`Services/KeyboardHook.cs`) en un hilo propio, que se queda con la pulsación. Windows quita sin avisar un gancho que tarda en responder, así que su función no debe esperar nunca al hilo de la interfaz: solo consulta `KeyInterceptor` y encola el atajo con `BeginInvoke`. Con una ventana de administrador en primer plano no recibe teclas (protección de Windows, comprobado el 19-10-2026) y Recortes gana. Se descartó a propósito: arreglarlo exigía ejecutar la app como administrador, firmarla con `uiAccess`, o desactivar la opción de Recortes y registrar también la tecla con `RegisterHotKey`. En este equipo, `RegisterHotKey` acepta Impr Pant aunque Recortes la tenga, pero Recortes gana igualmente.
 - **Desenfoque de Censurar** (`Imaging/Censor.cs`, `Blur`): se recalcula en cada movimiento del ratón, así que tiene que ser rápido. Son tres desenfoques de caja por eje con sumas acumuladas, que dan casi el mismo resultado que el gaussiano (diferencia máxima de 10/255 en bordes duros, comprobada contra una referencia en `CensorTests`). Los métodos llevan `AggressiveOptimization` para que el primer arrastre no vaya con el código sin optimizar. Medido el 19-10-2026 (Release, mediana): 600×400 en 8–10 ms (antes 44–54), 1200×700 en 26–37 ms (antes 150), pantalla completa 1920×1080 en 82 ms (antes 377) y 4K en 256 ms (antes 1430).
@@ -99,5 +100,5 @@ Ninguna está aprobada; son puntos de partida para una conversación:
 - Probar y ajustar en varios monitores, DPI mixtos y 4K.
 - Resolver los pendientes menores de arriba.
 - Reducir el tamaño del `.exe` (178 MB), por ejemplo con compresión del ejecutable o un instalador, midiendo el arranque.
-- Más idiomas: los textos ya están en `Strings.resx`.
-- Funciones que el diseño dejó fuera: captura con desplazamiento, OCR o grabación (ver «Lo que no es» en el diseño).
+- Más idiomas: hay que añadir `Strings.<idioma>.resx`, un valor a `Language` y `LanguagePreference`, y nombres de teclas en `HotkeyRules`.
+- Funciones que el diseño dejó fuera: OCR o grabación (ver «Lo que no es» en el diseño). La captura con desplazamiento se está diseñando (19-10-2026).

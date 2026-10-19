@@ -31,10 +31,11 @@ public static class ScreenCapture
         var bitmap = Gdi32.CreateDIBSection(screenDc, ref header, Gdi32.DIB_RGB_COLORS, out var bits, IntPtr.Zero, 0);
         try
         {
-            if (bitmap == IntPtr.Zero) throw new Win32Exception("CreateDIBSection falló.");
+            // These messages reach the user through ToastCaptureFailed, so they are localized.
+            if (bitmap == IntPtr.Zero) throw new Win32Exception(Ui.Strings.ErrorCaptureBitmap);
             var previous = Gdi32.SelectObject(memoryDc, bitmap);
             if (!Gdi32.BitBlt(memoryDc, 0, 0, bounds.Width, bounds.Height, screenDc, bounds.X, bounds.Y, Gdi32.SRCCOPY | Gdi32.CAPTUREBLT))
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "BitBlt falló.");
+                throw new Win32Exception(Marshal.GetLastWin32Error(), Ui.Strings.ErrorCaptureCopy);
             if (includeCursor) DrawCursor(memoryDc, bounds);
             Gdi32.SelectObject(memoryDc, previous);
 

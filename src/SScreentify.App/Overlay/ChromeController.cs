@@ -13,12 +13,13 @@ public sealed class ChromeController
 {
     private const double GapDip = 8;
     private readonly Popup _colorPopup;
+    private readonly ColorPalette _palette;
     private OverlayWindow? _host;
     private bool _visible;
 
     public ChromeController()
     {
-        var palette = new ColorPalette();
+        var palette = _palette = new ColorPalette();
         _colorPopup = new Popup
         {
             Child = palette,
@@ -43,6 +44,12 @@ public sealed class ChromeController
 
     /// <summary>Follows the tools bar while the Censor tool is active.</summary>
     public CensorBar Censor { get; } = new() { Visibility = Visibility.Collapsed };
+
+    /// <summary>Re-reads every tooltip and label after the interface language changed.</summary>
+    public void RefreshTexts()
+    {
+        foreach (var texts in new[] { Tools.Texts, Actions.Texts, Censor.Texts, _palette.Texts }) texts.Refresh();
+    }
 
     public void Attach(CaptureSession session)
     {

@@ -5,8 +5,9 @@ namespace SScreentify.Core.Files;
 
 public static class FileNaming
 {
-    public static string DefaultName(DateTime local, ImageFormat f) =>
-        "Captura_" + local.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + Extension(f);
+    public static string DefaultName(DateTime local, ImageFormat f, Language language) =>
+        (language == Language.English ? "Screenshot_" : "Captura_")
+        + local.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + Extension(f);
 
     /// <summary>The path for <paramref name="name"/> in <paramref name="folder"/>, numbered like Explorer
     /// ("Captura (2).png") when that name is taken, so a new capture never replaces an earlier one.</summary>

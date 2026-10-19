@@ -10,7 +10,8 @@ Funciona sin conexión: no hace ninguna petición de red.
 - **Editor:** selección (V), lápiz, línea, flecha, rectángulo, círculo, resaltador, texto y color. La rueda del ratón cambia el grosor o el tamaño de letra. Mayús fija ángulos de 45° y cuadrados o círculos perfectos. Deshacer con Ctrl+Z y rehacer con Ctrl+Y o Ctrl+Mayús+Z.
 - **Censurar:** pixelado, desenfoque o bloque sólido. Se calcula desde los píxeles originales y queda incrustado en la imagen final. Para datos sensibles usa el bloque sólido.
 - **Acciones:** copiar (PNG + mapa de bits), guardar (PNG, JPG o BMP, sin metadatos) e imprimir. Atajo opcional para guardar la pantalla completa al instante.
-- **Opciones:** avisos, incluir el cursor, recordar la última selección, iniciar con Windows, atajos, formato, calidad JPG y carpeta por defecto. La configuración se guarda en `%APPDATA%\SScreentify\settings.json`.
+- **Idiomas:** español e inglés. Por defecto usa el idioma de Windows (español si Windows está en español, inglés en cualquier otro caso); se puede cambiar en Opciones.
+- **Opciones:** avisos, incluir el cursor, recordar la última selección, iniciar con Windows, idioma, atajos, formato, calidad JPG y carpeta por defecto. La configuración se guarda en `%APPDATA%\SScreentify\settings.json`.
 
 ## Impr Pant en Windows 11
 

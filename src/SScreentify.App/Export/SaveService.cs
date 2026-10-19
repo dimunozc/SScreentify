@@ -1,6 +1,7 @@
 using System.Windows;
 using Microsoft.Win32;
 using SScreentify.App.Services;
+using SScreentify.App.Ui;
 using SScreentify.Core.Files;
 using SScreentify.Core.Settings;
 
@@ -51,7 +52,7 @@ public static class SaveService
         {
             Filter = "PNG (*.png)|*.png|JPG (*.jpg)|*.jpg|BMP (*.bmp)|*.bmp",
             FilterIndex = Array.IndexOf(FilterOrder, s.Format) + 1,
-            FileName = FileNaming.DefaultName(DateTime.Now, s.Format),
+            FileName = FileNaming.DefaultName(DateTime.Now, s.Format, UiLanguage.Current),
             InitialDirectory = ResolveInitialFolder(s.LastSaveFolder, s.DefaultFolder),
             AddExtension = true,
             OverwritePrompt = true,

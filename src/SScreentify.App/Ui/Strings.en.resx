@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="TrayTooltip" xml:space="preserve"><value>Press {0} to capture</value></data>
+  <data name="MenuCapture" xml:space="preserve"><value>Capture</value></data>
+  <data name="MenuOptions" xml:space="preserve"><value>Options</value></data>
+  <data name="MenuAbout" xml:space="preserve"><value>About</value></data>
+  <data name="MenuExit" xml:space="preserve"><value>Exit</value></data>
+  <data name="ToastCopied" xml:space="preserve"><value>Screenshot copied to the clipboard</value></data>
+  <data name="ToastSaved" xml:space="preserve"><value>Screenshot saved to {0}. Click to open the folder.</value></data>
+  <data name="ToastCopyBusy" xml:space="preserve"><value>Couldn't copy: another app is using the clipboard.</value></data>
+  <data name="ToastSaveFailed" xml:space="preserve"><value>Couldn't save the screenshot: {0}</value></data>
+  <data name="ToastHotkeyFailed" xml:space="preserve"><value>Couldn't register the shortcut {0}. Another app is probably using it. Click here to open Options.</value></data>
+  <data name="SettingsCorrupt" xml:space="preserve"><value>The settings were damaged. A copy was saved to settings.json.bak and the defaults were restored.</value></data>
+  <data name="HotkeyInvalid" xml:space="preserve"><value>One of your shortcuts isn't valid. To turn it off, clear its checkbox.</value></data>
+  <data name="HotkeyDuplicate" xml:space="preserve"><value>You can't give the same shortcut to two actions. Change one of them.</value></data>
+  <data name="CensorNote" xml:space="preserve"><value>Pixelation and blur can be partly reversed. For sensitive data, use a solid block.</value></data>
+  <data name="ToolSelect" xml:space="preserve"><value>Select (V)</value></data>
+  <data name="ToolPen" xml:space="preserve"><value>Pen</value></data>
+  <data name="ToolLine" xml:space="preserve"><value>Line</value></data>
+  <data name="ToolArrow" xml:space="preserve"><value>Arrow</value></data>
+  <data name="ToolRectangle" xml:space="preserve"><value>Rectangle</value></data>
+  <data name="ToolEllipse" xml:space="preserve"><value>Circle</value></data>
+  <data name="ToolMarker" xml:space="preserve"><value>Highlighter</value></data>
+  <data name="ToolText" xml:space="preserve"><value>Text</value></data>
+  <data name="ToolCensor" xml:space="preserve"><value>Censor</value></data>
+  <data name="ToolColor" xml:space="preserve"><value>Color</value></data>
+  <data name="ToolUndo" xml:space="preserve"><value>Undo (Ctrl+Z)</value></data>
+  <data name="ToolRedo" xml:space="preserve"><value>Redo (Ctrl+Y)</value></data>
+  <data name="ActionCopy" xml:space="preserve"><value>Copy (Ctrl+C)</value></data>
+  <data name="ActionSave" xml:space="preserve"><value>Save (Ctrl+S)</value></data>
+  <data name="ActionPrint" xml:space="preserve"><value>Print (Ctrl+P)</value></data>
+  <data name="ActionClose" xml:space="preserve"><value>Close (Esc)</value></data>
+  <data name="CensorPixelate" xml:space="preserve"><value>Pixelate</value></data>
+  <data name="CensorBlur" xml:space="preserve"><value>Blur</value></data>
+  <data name="CensorSolid" xml:space="preserve"><value>Solid block</value></data>
+  <data name="OptionsTitle" xml:space="preserve"><value>SScreentify Options</value></data>
+  <data name="TabGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="TabHotkeys" xml:space="preserve"><value>Shortcuts</value></data>
+  <data name="TabFormats" xml:space="preserve"><value>Formats</value></data>
+  <data name="OptShowNotifications" xml:space="preserve"><value>Show a notice after copying or saving</value></data>
+  <data name="OptCaptureCursor" xml:space="preserve"><value>Include the cursor in screenshots</value></data>
+  <data name="OptKeepSelection" xml:space="preserve"><value>Remember the last selection</value></data>
+  <data name="OptStartWithWindows" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="OptLanguage" xml:space="preserve"><value>Language</value></data>
+  <data name="HotkeyMain" xml:space="preserve"><value>Capture shortcut</value></data>
+  <data name="HotkeySaveFullscreen" xml:space="preserve"><value>Save the full screen instantly</value></data>
+  <data name="HotkeyHint" xml:space="preserve"><value>Click the field and press the key combination. Backspace clears it.</value></data>
+  <data name="OptFormat" xml:space="preserve"><value>Default format</value></data>
+  <data name="OptJpegQuality" xml:space="preserve"><value>JPG quality</value></data>
+  <data name="OptDefaultFolder" xml:space="preserve"><value>Default folder</value></data>
+  <data name="ButtonBrowse" xml:space="preserve"><value>Browse…</value></data>
+  <data name="ButtonOk" xml:space="preserve"><value>OK</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>About SScreentify</value></data>
+  <data name="AboutText" xml:space="preserve"><value>Open-source software.</value></data>
+  <data name="AboutVersion" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="PaletteCustom" xml:space="preserve"><value>Custom…</value></data>
+  <data name="ToastCopyFailed" xml:space="preserve"><value>Couldn't copy the screenshot to the clipboard.</value></data>
+  <data name="ToastPrintFailed" xml:space="preserve"><value>Couldn't print: {0}</value></data>
+  <data name="ToastCaptureFailed" xml:space="preserve"><value>Couldn't capture the screen: {0}</value></data>
+  <data name="ToastUnexpectedError" xml:space="preserve"><value>Something went wrong: {0}. Details are in error.log.</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>Automatic (same as Windows)</value></data>
+  <data name="ErrorCaptureBitmap" xml:space="preserve"><value>The image couldn't be prepared.</value></data>
+  <data name="ErrorCaptureCopy" xml:space="preserve"><value>Windows didn't allow copying the screen.</value></data>
+</root>

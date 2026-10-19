@@ -16,14 +16,15 @@ public sealed class CensorBar : UserControl
     public CensorBar()
     {
         var row = new StackPanel { Orientation = Orientation.Horizontal };
-        foreach (var (style, label) in new[]
+        foreach (var (style, label) in new (CensorStyle, Func<string>)[]
                  {
-                     (CensorStyle.Pixelate, Strings.CensorPixelate),
-                     (CensorStyle.Blur, Strings.CensorBlur),
-                     (CensorStyle.Solid, Strings.CensorSolid),
+                     (CensorStyle.Pixelate, () => Strings.CensorPixelate),
+                     (CensorStyle.Blur, () => Strings.CensorBlur),
+                     (CensorStyle.Solid, () => Strings.CensorSolid),
                  })
         {
-            var button = new ToggleButton { Content = label, Padding = new Thickness(10, 0, 10, 0) };
+            var button = new ToggleButton { Padding = new Thickness(10, 0, 10, 0) };
+            Texts.Add(() => button.Content = label());
             button.SetResourceReference(StyleProperty, "GlassButton");
             button.Width = double.NaN;
             button.SetResourceReference(FontFamilyProperty, "UiFont");
@@ -35,12 +36,12 @@ public sealed class CensorBar : UserControl
 
         _note = new TextBlock
         {
-            Text = Strings.CensorNote,
             TextWrapping = TextWrapping.Wrap,
             MaxWidth = 240,
             FontSize = 11,
             Margin = new Thickness(4, 6, 4, 2),
         };
+        Texts.Add(() => _note.Text = Strings.CensorNote);
         _note.SetResourceReference(TextBlock.ForegroundProperty, "MutedTextBrush");
         _note.SetResourceReference(TextBlock.FontFamilyProperty, "UiFont");
 
@@ -52,6 +53,7 @@ public sealed class CensorBar : UserControl
     }
 
     public GlassPanel Panel { get; }
+    public LocalizedTexts Texts { get; } = new();
 
     public string Note => _note.Text;
 

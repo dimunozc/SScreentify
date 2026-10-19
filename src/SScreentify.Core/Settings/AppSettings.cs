@@ -24,6 +24,7 @@ public sealed record AppSettings
     public double FontSize { get; init; } = 20;
     public CensorStyle CensorStyle { get; init; } = CensorStyle.Pixelate;
     public PixelRect? LastSelection { get; init; }
+    public LanguagePreference Language { get; init; } = LanguagePreference.Auto;
 
     /// <summary>Brings values read from disk back into their valid ranges.</summary>
     public AppSettings Normalize()

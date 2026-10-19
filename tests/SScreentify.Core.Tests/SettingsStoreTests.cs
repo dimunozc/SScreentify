@@ -44,6 +44,7 @@ public sealed class SettingsStoreTests : IDisposable
             FontSize = 32,
             CensorStyle = CensorStyle.Solid,
             LastSelection = new PixelRect(-100, 20, 300, 200),
+            Language = LanguagePreference.English,
         };
         store.Save(settings);
 

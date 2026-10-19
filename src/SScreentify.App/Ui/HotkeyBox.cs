@@ -22,7 +22,7 @@ public sealed class HotkeyBox : TextBox
         set
         {
             _value = value;
-            Text = value.VirtualKey == 0 ? "—" : HotkeyRules.Display(value);
+            Text = value.VirtualKey == 0 ? "—" : HotkeyRules.Display(value, UiLanguage.Current);
         }
     }
 

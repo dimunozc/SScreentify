@@ -7,12 +7,13 @@ namespace SScreentify.Core.Tests;
 public class FileNamingTests
 {
     [Theory]
-    [InlineData(ImageFormat.Png, "Captura_2026-10-17_16-52-03.png")]
-    [InlineData(ImageFormat.Jpeg, "Captura_2026-10-17_16-52-03.jpg")]
-    [InlineData(ImageFormat.Bmp, "Captura_2026-10-17_16-52-03.bmp")]
-    public void DefaultName_Formats(ImageFormat format, string expected)
+    [InlineData(ImageFormat.Png, Language.Spanish, "Captura_2026-10-17_16-52-03.png")]
+    [InlineData(ImageFormat.Jpeg, Language.Spanish, "Captura_2026-10-17_16-52-03.jpg")]
+    [InlineData(ImageFormat.Bmp, Language.Spanish, "Captura_2026-10-17_16-52-03.bmp")]
+    [InlineData(ImageFormat.Png, Language.English, "Screenshot_2026-10-17_16-52-03.png")]
+    public void DefaultName_Formats(ImageFormat format, Language language, string expected)
     {
-        Assert.Equal(expected, FileNaming.DefaultName(new DateTime(2026, 10, 17, 16, 52, 3), format));
+        Assert.Equal(expected, FileNaming.DefaultName(new DateTime(2026, 10, 17, 16, 52, 3), format, language));
     }
 
     [Fact]

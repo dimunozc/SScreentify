@@ -52,7 +52,6 @@ public static class Strings
     public static string OptKeepSelection => Get(nameof(OptKeepSelection));
     public static string OptStartWithWindows => Get(nameof(OptStartWithWindows));
     public static string OptLanguage => Get(nameof(OptLanguage));
-    public static string LanguageSpanish => Get(nameof(LanguageSpanish));
     public static string HotkeyMain => Get(nameof(HotkeyMain));
     public static string HotkeySaveFullscreen => Get(nameof(HotkeySaveFullscreen));
     public static string HotkeyHint => Get(nameof(HotkeyHint));
@@ -70,6 +69,9 @@ public static class Strings
     public static string ToastPrintFailed => Get(nameof(ToastPrintFailed));
     public static string ToastCaptureFailed => Get(nameof(ToastCaptureFailed));
     public static string ToastUnexpectedError => Get(nameof(ToastUnexpectedError));
+    public static string LanguageAuto => Get(nameof(LanguageAuto));
+    public static string ErrorCaptureBitmap => Get(nameof(ErrorCaptureBitmap));
+    public static string ErrorCaptureCopy => Get(nameof(ErrorCaptureCopy));
 
     private static string Get(string key) =>
         Resources.GetString(key, Culture) ?? throw new MissingManifestResourceException(key);

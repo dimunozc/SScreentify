@@ -46,7 +46,6 @@
   <data name="OptKeepSelection" xml:space="preserve"><value>Recordar la última selección</value></data>
   <data name="OptStartWithWindows" xml:space="preserve"><value>Iniciar con Windows</value></data>
   <data name="OptLanguage" xml:space="preserve"><value>Idioma</value></data>
-  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
   <data name="HotkeyMain" xml:space="preserve"><value>Atajo general</value></data>
   <data name="HotkeySaveFullscreen" xml:space="preserve"><value>Guardar la pantalla completa al instante</value></data>
   <data name="HotkeyHint" xml:space="preserve"><value>Haz clic en el campo y pulsa la combinación. Retroceso lo borra.</value></data>
@@ -57,11 +56,14 @@
   <data name="ButtonOk" xml:space="preserve"><value>Aceptar</value></data>
   <data name="ButtonCancel" xml:space="preserve"><value>Cancelar</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Acerca de SScreentify</value></data>
-  <data name="AboutText" xml:space="preserve"><value>Herramienta de capturas de pantalla sin conexión.</value></data>
+  <data name="AboutText" xml:space="preserve"><value>Programa de código abierto.</value></data>
   <data name="AboutVersion" xml:space="preserve"><value>Versión {0}</value></data>
   <data name="PaletteCustom" xml:space="preserve"><value>Personalizado…</value></data>
   <data name="ToastCopyFailed" xml:space="preserve"><value>No se pudo copiar la captura al portapapeles.</value></data>
   <data name="ToastPrintFailed" xml:space="preserve"><value>No se pudo imprimir: {0}</value></data>
   <data name="ToastCaptureFailed" xml:space="preserve"><value>No se pudo capturar la pantalla: {0}</value></data>
   <data name="ToastUnexpectedError" xml:space="preserve"><value>Algo salió mal: {0}. Los detalles están en error.log.</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>Automático (el de Windows)</value></data>
+  <data name="ErrorCaptureBitmap" xml:space="preserve"><value>No se pudo preparar la imagen.</value></data>
+  <data name="ErrorCaptureCopy" xml:space="preserve"><value>Windows no permitió copiar la pantalla.</value></data>
 </root>

@@ -17,6 +17,7 @@ public sealed class OptionsWindow : DarkWindow
     private readonly CheckBox _notifications, _cursor, _keepSelection, _startWithWindows, _mainEnabled, _fullEnabled;
     private readonly HotkeyBox _main, _full;
     private readonly Dictionary<ImageFormat, RadioButton> _formats = new();
+    private readonly Dictionary<LanguagePreference, RadioButton> _languages = new();
     private readonly Slider _quality;
     private readonly FrameworkElement _qualityRow;
     private readonly TextBox _folder;
@@ -31,8 +32,15 @@ public sealed class OptionsWindow : DarkWindow
         _cursor = Check(Strings.OptCaptureCursor, current.CaptureCursor);
         _keepSelection = Check(Strings.OptKeepSelection, current.KeepSelection);
         _startWithWindows = Check(Strings.OptStartWithWindows, current.StartWithWindows);
-        var general = Section(_notifications, _cursor, _keepSelection, _startWithWindows,
-            Labeled(Strings.OptLanguage, new TextBlock { Text = Strings.LanguageSpanish, Foreground = Palette.Icon }));
+        // Language names stay in their own language so anyone can find theirs.
+        var languageRow = new StackPanel();
+        foreach (var (language, label) in new[] { (LanguagePreference.Auto, Strings.LanguageAuto), (LanguagePreference.Spanish, "Español"), (LanguagePreference.English, "English") })
+        {
+            var radio = new RadioButton { Content = label, GroupName = "language", IsChecked = current.Language == language, Margin = new Thickness(0, 0, 0, 6), Foreground = Palette.Text };
+            _languages[language] = radio;
+            languageRow.Children.Add(radio);
+        }
+        var general = Section(_notifications, _cursor, _keepSelection, _startWithWindows, Labeled(Strings.OptLanguage, languageRow));
 
         _mainEnabled = Check(Strings.HotkeyMain, current.MainHotkey.Enabled);
         _main = Field(new HotkeyBox { Value = current.MainHotkey });
@@ -125,6 +133,7 @@ public sealed class OptionsWindow : DarkWindow
             Format = _formats.First(f => f.Value.IsChecked == true).Key,
             JpegQuality = (int)_quality.Value,
             DefaultFolder = _folder.Text == AppPaths.DefaultPicturesFolder ? null : _folder.Text,
+            Language = _languages.First(l => l.Value.IsChecked == true).Key,
         };
         DialogResult = true;
     }

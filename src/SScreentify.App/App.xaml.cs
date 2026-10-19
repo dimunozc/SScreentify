@@ -55,6 +55,7 @@ public partial class App : Application
         _store = new SettingsStore(AppPaths.SettingsFile);
         var loaded = _store.Load();
         Settings = loaded.Settings;
+        UiLanguage.Apply(Settings.Language);
 
         _overlay = new OverlayController(() => Settings, SaveSettings);
         _overlay.Prewarm();
@@ -109,7 +110,7 @@ public partial class App : Application
     private void ShowHotkeyNotices()
     {
         if (_failedHotkey is { } failed)
-            _toasts.Show(string.Format(Strings.ToastHotkeyFailed, HotkeyRules.Display(failed)), onClick: ShowOptions, isError: true);
+            _toasts.Show(string.Format(Strings.ToastHotkeyFailed, HotkeyRules.Display(failed, UiLanguage.Current)), onClick: ShowOptions, isError: true);
     }
 
     private void ShowOptions()
@@ -130,6 +131,11 @@ public partial class App : Application
             {
                 SaveSettings(result);
                 if (Environment.ProcessPath is { } exe) AutoStart.ForCurrentUser().Apply(result.StartWithWindows, exe);
+                if (UiLanguage.Apply(result.Language))
+                {
+                    _tray?.RefreshTexts();
+                    _overlay?.RefreshTexts();
+                }
             }
         }
         finally
@@ -153,7 +159,7 @@ public partial class App : Application
         _about.Show();
     }
 
-    private string TrayTooltip() => string.Format(Strings.TrayTooltip, HotkeyRules.Display(Settings.MainHotkey));
+    private string TrayTooltip() => string.Format(Strings.TrayTooltip, HotkeyRules.Display(Settings.MainHotkey, UiLanguage.Current));
 
     private void OnHotkey(HotkeyId id)
     {
