@@ -29,6 +29,10 @@ SScreentify vive en la bandeja del sistema. Al pulsar **Impr Pant**, la pantalla
 
 Está pensada para la captura de todos los días, la de «mira, es esto»: se abre al instante, se anota rápido y no estorba. Nunca usa la red.
 
+### Un banco de pruebas para REA
+
+SScreentify también es una prueba práctica de ingeniería inversa con [REA (Reverse Engineer Anything)](https://github.com/morluto/rea). El proyecto sirvió para probar el flujo de trabajo de REA con una aplicación de escritorio real: estudiar cómo funciona una función y luego reconstruirla con código propio y limpio.
+
 ## Funciones
 
 - **Selector instantáneo** en todos los monitores, con soporte de DPI por monitor. Se abre en unos 30 ms.

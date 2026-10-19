@@ -29,6 +29,10 @@ SScreentify lives in the notification area. When you press **Print Screen**, the
 
 It is built for the everyday "show someone what I mean" screenshot: open instantly, annotate fast and get out of the way. It never touches the network.
 
+### A test bed for REA
+
+SScreentify is also a hands-on test of reverse engineering with [REA (Reverse Engineer Anything)](https://github.com/morluto/rea). The project was a way to try REA's workflow on a real desktop app: study how a feature works and then rebuild it as clean, original code.
+
 ## Features
 
 - **Instant selector** on every monitor, with per-monitor DPI support. It opens in about 30 ms.
